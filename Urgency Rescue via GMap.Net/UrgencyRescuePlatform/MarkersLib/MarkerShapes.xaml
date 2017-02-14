@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+										xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+										xmlns:local="clr-namespace:MarkersLib">
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkerShapesKeys},ResourceId=HighlightFlag}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/redFlag.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+	
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkerShapesKeys},ResourceId=YellowFlag}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/yellowFlag.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+	
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkerShapesKeys},ResourceId=PurpleFlag}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/purpleFlag.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkerShapesKeys},ResourceId=BlueFlag}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/blueFlag.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+</ResourceDictionary>

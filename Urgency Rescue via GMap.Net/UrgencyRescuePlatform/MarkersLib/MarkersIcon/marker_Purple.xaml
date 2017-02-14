@@ -1,0 +1,47 @@
+<!-- Created with Ai->XAML Export Plug-In Version 0.2 (PC/64) -->
+<!-- By Mike Swanson (http://blog.mikeswanson.com/)           -->
+
+<Viewbox Width="76.718" Height="115.807"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Viewbox.Resources>
+		
+	</Viewbox.Resources>
+	<Canvas Width="76.718" Height="115.807">
+
+  <Canvas>
+
+  <Canvas>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Fill="#ffb729c3" Data="F1 M 76.718,61.374 L 47.492,61.374 L 47.492,22.650 L 76.718,22.650 L 69.704,42.012 L 76.718,61.374 Z"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Opacity="0.1" Fill="#ff000000" Data="F1 M 76.718,61.374 L 47.492,61.374 L 47.492,22.650 L 76.718,22.650 L 69.704,42.012 L 76.718,61.374 Z"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Fill="#ffb519ff" Data="F1 M 62.471,52.606 L 16.805,52.606 L 16.805,13.882 L 62.471,13.882 L 62.471,52.606 Z"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Opacity="0.1" Fill="#ff000000" Data="F1 M 47.492,61.374 L 47.492,52.606 L 62.471,52.606 L 47.492,61.374 Z"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path StrokeThickness="7.3" Stroke="#ffeeeeec" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeMiterLimit="1.0" Data="F1 M 14.248,7.672 L 14.248,106.309"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path StrokeThickness="7.3" Stroke="#ffeeeeec" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeMiterLimit="1.0" Data="F1 M 6.576,106.309 L 21.920,106.309"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path StrokeThickness="7.3" Stroke="#ffeeeeec" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeMiterLimit="1.0" Data="F1 M 3.653,112.154 L 24.842,112.154"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Fill="#ffeeeeec" Data="F1 M 21.920,7.672 C 21.920,11.909 18.484,15.344 14.248,15.344 C 10.011,15.344 6.576,11.909 6.576,7.672 C 6.576,3.435 10.011,0.000 14.248,0.000 C 18.484,0.000 21.920,3.435 21.920,7.672 Z"/>
+
+  <!-- 图层 1/<编组>/<路径> -->
+  <Path Opacity="0.1" Fill="#ff000000" Data="F1 M 24.842,108.501 L 24.825,108.501 C 25.289,107.889 25.572,107.135 25.572,106.309 C 25.572,104.291 23.937,102.656 21.920,102.656 L 17.900,102.656 L 17.900,14.379 C 20.284,13.077 21.920,10.579 21.920,7.672 C 21.920,3.435 18.484,0.000 14.248,0.000 L 14.248,115.807 L 24.842,115.807 C 26.859,115.807 28.495,114.172 28.495,112.154 C 28.495,110.136 26.859,108.501 24.842,108.501 Z"/>
+
+  </Canvas>
+
+  </Canvas>
+</Canvas>
+</Viewbox>

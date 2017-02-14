@@ -1,0 +1,93 @@
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe.config
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.pdb
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.Core.dll
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.WindowsPresentation.dll
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csprojResolveAssemblyReference.cache
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.g.cs
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\App.g.cs
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.cache
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.lref
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.baml
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.g.resources
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.Properties.Resources.resources
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.GenerateResource.Cache
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.exe
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.pdb
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\Interop.JAVAWEBSTARTLib.dll
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.ResolveComReference.cache
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.dll
+D:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe.config
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.ResolveComReference.cache
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.exe
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.Core.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.WindowsPresentation.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csprojResolveAssemblyReference.cache
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.g.cs
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\App.g.cs
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.cache
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.lref
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.baml
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.g.resources
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.Properties.Resources.resources
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.GenerateResource.Cache
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\Interop.JAVAWEBSTARTLib.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Awesomium.Core.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Awesomium.Windows.Controls.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Awesomium.Core.xml
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Awesomium.Windows.Controls.xml
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.xml
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.pdb
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.xml
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\en-US.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\AwesomiumProcess
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Awesomium.dll
+E:\Users\Administrator\Documents\Visual Studio 2015\Projects\WPF Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\icudt42.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe.config
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.exe
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\UrgencyRescuePlatform.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Newtonsoft.Json.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\MarkersLib.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Newtonsoft.Json.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Newtonsoft.Json.xml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\Microsoft.Windows.Shell.xml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\RibbonControlsLibrary.xml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csprojResolveAssemblyReference.cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\Interop.JAVAWEBSTARTLib.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.ResolveComReference.cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\App.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform_MarkupCompile.lref
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindow.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.g.resources
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.Properties.Resources.resources
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.csproj.GenerateResource.Cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.exe
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\UrgencyRescuePlatform.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\ControlsButtonLib.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\LoginWindow.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\LoginWindow.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\loginWindowDictionary.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\MainWindowControlsDict.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\RibbonIcons.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\ControlsButtonLib.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.Core.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\bin\Debug\GMap.NET.WindowsPresentation.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\TinyMessageBox.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\UrgencyRescuePlatform\obj\Debug\TinyMessageBox.baml

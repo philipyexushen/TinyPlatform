@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+										xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+										xmlns:local="clr-namespace:MarkersLib">
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkersLibKeys},ResourceId=GmapRouteMarker}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/RouteMarker.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+
+	<DrawingGroup x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type local:MarkersLibKeys},ResourceId=GmapRoute_HMarker}">
+		<ImageDrawing Rect="0,0,30,30">
+			<ImageDrawing.ImageSource>
+				<BitmapImage UriSource="/MarkersLib;component/MarkersIcon/RouteMarker_H.png"/>
+			</ImageDrawing.ImageSource>
+		</ImageDrawing>
+	</DrawingGroup>
+</ResourceDictionary>

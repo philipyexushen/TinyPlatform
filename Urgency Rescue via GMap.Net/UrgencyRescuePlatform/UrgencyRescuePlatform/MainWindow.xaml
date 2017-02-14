@@ -1,0 +1,408 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+				xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				xmlns:local="clr-namespace:UrgencyRescuePlatform"
+				xmlns:gmap="clr-namespace:GMap.NET.WindowsPresentation;assembly=GMap.NET.WindowsPresentation"
+				xmlns:gMapCore="clr-namespace:GMap.NET;assembly=GMap.NET.Core"
+				x:Class="UrgencyRescuePlatform.MainWindow"
+				xmlns:r="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
+				xmlns:ctb="clr-namespace:ControlsButtonLib;assembly=ControlsButtonLib"
+				mc:Ignorable="d"
+				Name="platformWindow"
+				Icon="icon.ico"
+				Height="800" Width="1348"
+				Title="TinyPlatform"
+				WindowStyle="None" AllowsTransparency="True"
+				Background="Transparent" >
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/UrgencyRescuePlatform;component/RibbonIcons.xaml"/>
+				<ResourceDictionary Source="/UrgencyRescuePlatform;component/MainWindowControlsDict.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<ObjectDataProvider x:Key="_objectDataProvider_maps" ObjectType="{x:Type local:MapSourceHandler}"
+												  MethodName="GetMaps" IsAsynchronous="True"></ObjectDataProvider>
+			<ObjectDataProvider x:Key="_objectDataProvider_mapsMode" ObjectType="{x:Type local:MapLoadingModeHelper}"
+													MethodName="GetModes" IsAsynchronous="True"></ObjectDataProvider>
+
+			<Style x:Key="_statusBarTextBlockStyle" TargetType="{x:Type TextBlock}">
+				<Setter Property="Foreground" Value="White"></Setter>
+				<Setter Property="FontSize" Value="12.4"></Setter>
+				<Setter Property="FontFamily" Value="Microsoft YaHei"></Setter>
+				<Setter Property="FontWeight" Value="Regular"></Setter>
+				<Setter Property="TextOptions.TextFormattingMode" Value="Display"></Setter>
+			</Style>
+
+			<Style x:Key="_style_loacateTextBox" TargetType="{x:Type TextBox}">
+				<Style.Triggers>
+					<Trigger Property="Validation.HasError" Value="True">
+						<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+		</ResourceDictionary>
+	</Window.Resources>
+	<Window.CommandBindings>
+		<CommandBinding Command="local:AddRouteCommand.AddRoute"
+										CanExecute="addRouteCommand_CanExecute"
+										Executed="addRouteCommand_Executed"/>
+		<CommandBinding Command="local:GetDirectDistanceCommand.GetDirectDistance"
+										CanExecute="getDirectDistance_CanExecute"
+										Executed="getDirectDistance_Executed"/>
+		<CommandBinding Command="local:ReLoadMapCommand.ReloadMap"
+										Executed="ReloadMap_Executed"/>
+		<CommandBinding Command="local:LocateCommand.Locate"
+										CanExecute="LocateCommand_CanExecute"
+										/>
+	</Window.CommandBindings>
+	<Grid TextOptions.TextFormattingMode="Display">
+		<Border Margin="4">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"></RowDefinition>
+					<RowDefinition Height="Auto"></RowDefinition>
+					<RowDefinition Height="*"></RowDefinition>
+					<RowDefinition Height="Auto"></RowDefinition>
+				</Grid.RowDefinitions>
+
+				<Border x:Name="windowBackground" BorderBrush="#FF007ACC" BorderThickness="2" Background="#FF413A3A"
+								Grid.Row="0" Grid.RowSpan="4">
+					<Border.Effect>
+						<DropShadowEffect ShadowDepth="0" BlurRadius="5"></DropShadowEffect>
+					</Border.Effect>
+				</Border>
+
+				<!--****************************************************标题栏****************************************************-->
+				<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"></RowDefinition>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"></ColumnDefinition>
+						<ColumnDefinition Width="Auto"></ColumnDefinition>
+					</Grid.ColumnDefinitions>
+
+					<!--标题底色-->
+					<Border Background="{Binding ElementName=windowBackground,Path=Background}" Margin="3" 
+									Grid.Column="0" Grid.ColumnSpan="2" />
+
+					<Grid Grid.Column="0" Grid.ColumnSpan="2">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"></ColumnDefinition>
+							<ColumnDefinition Width="Auto"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<!--标题栏文字-->
+						<TextBlock Grid.Column="0" Name="windowTitle" Foreground="White"
+											 VerticalAlignment="Center" HorizontalAlignment="Left"
+											 Text="{Binding ElementName=platformWindow,Path=Title}"
+											 TextOptions.TextFormattingMode="Display"
+											 Margin="8,0,0,0" FontWeight="Bold"
+											 FontFamily="Microsoft YaHei" FontSize="12"/>
+
+						<Border x:Name="windowTitleTab" Background="Transparent" 
+										Grid.Column="0" Grid.ColumnSpan="4"
+										MouseLeftButtonDown="TitleBar_MouseDown">
+						</Border>
+
+						<ctb:ControlButtons Grid.Column="1" Name="controlsButtons" 
+																	OnClose="closeButton_Click"
+																	OnMaximizeOrNormal="maximizeOrNormalButton_Click"
+																	OnMinimize="minimizeButton_Click">
+						</ctb:ControlButtons>
+					</Grid>
+				</Grid>
+
+				<!--****************************************************状态栏****************************************************-->
+				<Border Grid.Row="1" ClipToBounds="True">
+					<r:Ribbon x:Name="ribbon" Grid.Row="1" Background="#FF9C9C9C" Margin="3,-22,3,0">
+						<r:Ribbon.ApplicationMenu>
+							<r:RibbonApplicationMenu>
+								<r:RibbonApplicationMenuItem Header="New" ToolTipTitle="Application Menu">
+								</r:RibbonApplicationMenuItem>
+								<r:RibbonApplicationMenuItem Header="_Save">
+									<r:RibbonApplicationMenuItem Header="Save"/>
+									<r:RibbonApplicationMenuItem Header="SaveAs"/>
+								</r:RibbonApplicationMenuItem>
+								<r:RibbonSeparator></r:RibbonSeparator>
+								<r:RibbonApplicationMenuItem Header="About"/>
+								<r:RibbonApplicationMenuItem Header="Exit"/>
+							</r:RibbonApplicationMenu>
+						</r:Ribbon.ApplicationMenu>
+						<r:RibbonTab Header="控制" Margin="0">
+							<r:RibbonGroup Header="控制面板">
+								<r:RibbonToggleButton Label="消息面板" x:Name="_button_informPanel"
+																			SmallImageSource="{StaticResource openPanelImage}" 
+																			LargeImageSource="{StaticResource openPanelImage}"
+																			Click="_button_informPanel_Click"
+																			IsChecked="False">
+								</r:RibbonToggleButton>
+							</r:RibbonGroup>
+
+							<r:RibbonGroup Header="地图" Margin="3,3,0,0">
+								<r:RibbonControlGroup>
+									<Label ToolTip="地图源" HorizontalAlignment="Center" VerticalAlignment="Center">
+										<Label.Content>
+											<Image Source="{StaticResource _drawingImage_loadMap}" Width="16" Height="16"></Image>
+										</Label.Content>
+									</Label>
+									<ComboBox x:Name="_comboBox_mapSources" Width="180" 
+														ItemsSource="{Binding Source={StaticResource _objectDataProvider_maps}}"
+														SelectionChanged="_comboBox_mapSources_SelectionChanged"
+														HorizontalContentAlignment="Stretch"
+														ItemContainerStyle="{StaticResource _style_mapSelectionComboBox}"
+														ItemTemplate="{StaticResource _dataTemplate_mapSelectionComboBox}"
+														IsEditable="True" TextSearch.TextPath="ProviderName" IsReadOnly="True">
+									</ComboBox>
+								</r:RibbonControlGroup>
+								<r:RibbonControlGroup Margin="0,3,0,0">
+									<Label ToolTip="地图源加载模式" HorizontalAlignment="Center" VerticalAlignment="Center">
+										<Label.Content>
+											<Image Source="{StaticResource _drawingImage_accessMode}" Width="16" Height="16"></Image>
+										</Label.Content>
+									</Label>
+									<ComboBox x:Name="_comboBox_mapAccessMode" Width="180"  
+														ItemsSource="{Binding Source={StaticResource _objectDataProvider_mapsMode}}"
+														DisplayMemberPath="ModeName"
+														ItemContainerStyle="{StaticResource _style_mapAccessModeComboBoxItem}"
+														IsEditable="True" IsReadOnly="True" TextSearch.TextPath="ModeName"
+														SelectionChanged="_comboBox_mapAccessMode_SelectionChanged">
+									</ComboBox>
+
+									
+								</r:RibbonControlGroup>
+							</r:RibbonGroup>
+							<r:RibbonGroup Header="地图功能" x:Name="_group_mapfunctions">
+								<r:RibbonControlGroup Margin="3,3,0,3">
+									<r:RibbonTwoLineText Text="Lat:" Margin="0,0,5,0"/>
+									<r:RibbonTextBox x:Name="_ribbonTextBox_lat"
+																	 Text="{Binding Path=Lat,
+										ValidatesOnNotifyDataErrors=True,NotifyOnValidationError=True,UpdateSourceTrigger=PropertyChanged}"
+																	 Style="{StaticResource _style_loacateTextBox}"
+																	 />
+								</r:RibbonControlGroup>
+
+								<r:RibbonControlGroup Margin="3,0,0,3" BorderThickness="0">
+									<r:RibbonTwoLineText Text="Lng:" />
+									<r:RibbonTextBox x:Name="_ribbonTextBox_lng"
+																	 Text="{Binding Path=Lng,
+										ValidatesOnNotifyDataErrors=True,NotifyOnValidationError=True,UpdateSourceTrigger=PropertyChanged}"
+																	 Style="{StaticResource _style_loacateTextBox}"/>
+								</r:RibbonControlGroup>
+								
+								<r:RibbonGroup Margin="0,-3,0,0" Height="80" Width="60">
+									<r:RibbonGroup.GroupSizeDefinitions>
+										<r:RibbonGroupSizeDefinition IsCollapsed="True">
+											<r:RibbonControlSizeDefinition ImageSize="Small" IsLabelVisible="True"/>
+											<r:RibbonControlSizeDefinition ImageSize="Small" IsLabelVisible="True"/>
+											<r:RibbonControlSizeDefinition ImageSize="Small" IsLabelVisible="True"/>
+										</r:RibbonGroupSizeDefinition>
+									</r:RibbonGroup.GroupSizeDefinitions>
+									<r:RibbonButton	Name="_button_locate" Label="定位" ToolTip="定位到指定的位置" 
+																	SmallImageSource="{StaticResource _drawingImage_locate}" Margin="0,0,0,-4" 
+																	Command="local:LocateCommand.Locate"
+																	CommandTarget="{Binding ElementName=platformWindow}"
+																	Click="_button_locate_Click"/>
+									<r:RibbonButton	Name="_drawingImage_addMarker" Label="添加" ToolTip="添加新的指定坐标" 
+																	SmallImageSource="{StaticResource _drawingImage_addMarker}" Margin="0,1,0,0" 
+																	Command="local:LocateCommand.Locate"
+																	CommandTarget="{Binding ElementName=platformWindow}"
+																	Click="_drawingImage_addMarker_Click"/>
+									<r:RibbonButton	Name="_button_reloadMap" Label="刷新" ToolTip="重新加载地图"
+																	SmallImageSource="{StaticResource _drawingImage_reloadMap}" Margin="-48,38,48,-38"
+																	Click="_button_reloadMap_Click"/>
+								</r:RibbonGroup>
+
+								<r:RibbonControlGroup>
+									
+								</r:RibbonControlGroup>
+								<r:RibbonButton Label="添加路径" x:Name="_button_addRoute"
+																SmallImageSource="{StaticResource _drawingBrush_addRouteIcon}"
+																LargeImageSource="{StaticResource _drawingBrush_addRouteIcon}"
+																CommandTarget="{Binding ElementName=platformWindow}"
+																Command="local:AddRouteCommand.AddRoute"
+																Click="_button_addRoute_Click">
+								</r:RibbonButton>
+								<r:RibbonButton Label="测距" x:Name="_button_getDirectDistance"
+																SmallImageSource="{StaticResource _drawingImage_getDirectDistance}"
+																LargeImageSource="{StaticResource _drawingImage_getDirectDistance}"
+																CommandTarget="{Binding ElementName=platformWindow}"
+																Command="local:GetDirectDistanceCommand.GetDirectDistance"
+																Click="_button_getDirectDistance_Click"/>
+							</r:RibbonGroup>
+
+							<r:RibbonGroup Header="用户">
+									<r:RibbonButton Name="_button_login" Label="登陆" 
+																	SmallImageSource="{StaticResource loginIcon}" 
+																	LargeImageSource="{StaticResource loginIcon}"
+																	Click="loginButton_Click"/>
+
+									<r:RibbonButton	Name="_button_logout" Label="退出登录" 
+																	SmallImageSource="{StaticResource logoutIcon}" 
+																	LargeImageSource="{StaticResource logoutIcon}"
+																	IsEnabled="False"
+																	Click="loginButton_Click"/>
+								</r:RibbonGroup>
+						</r:RibbonTab>
+					</r:Ribbon>
+				</Border>
+
+				<Grid Grid.Row="2" Margin="3,3,3,0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="1.7*"/>
+					</Grid.ColumnDefinitions>
+					<gmap:GMapControl   Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="2" 
+															x:Name="mapMainWindow"
+															MinZoom="4" MaxZoom="21"
+															VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+															MouseMove="mapMainWindow_MouseMove" 
+															MouseDoubleClick="mapMainWindow_MouseLeftButtonDown">
+					</gmap:GMapControl>
+
+					<Grid x:Name="_grid_infromPanel" Grid.Row="0" Grid.RowSpan="3" Visibility="Collapsed">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="3*"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<TextBox x:Name="msgBox" Grid.Row="0" Grid.Column="0" 
+									 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+									 BorderThickness="2"
+									 Margin="3"
+									 AcceptsReturn="True" Background="#FF4E4E4E" Foreground="White" BorderBrush="#FF2CA1DF"
+									 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+										TextOptions.TextFormattingMode="Display"
+									 ScrollViewer.VerticalScrollBarVisibility="Visible"
+									 FontSize="12.4"
+									 ScrollViewer.CanContentScroll="True" FontFamily="Microsoft YaHei"/>
+
+						<TextBox x:Name="inputMsgBox" Grid.Row="1" Grid.Column="0" 
+									 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+									 Margin="3"
+									 BorderThickness="2"
+									 AcceptsReturn="True" Background="#FF4E4E4E" Foreground="White" BorderBrush="#FF2CA1DF"
+									 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+									 TextOptions.TextFormattingMode="Display"
+									 ScrollViewer.VerticalScrollBarVisibility="Visible"
+									 FontSize="12.4"
+									 ScrollViewer.CanContentScroll="True" FontFamily="Microsoft YaHei"/>
+						<Button Grid.Row="2" Grid.Column="0" Margin="3" Content="发送消息" Click="sendMsgBtn_Click"
+										HorizontalAlignment="Right"></Button>
+					</Grid>
+					<Border CornerRadius="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,10,20,10"
+									Background="#FF423F3F" Opacity="0.8">
+						<Grid >
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="*"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+
+							<Button x:Name="_button_zoomOut"
+											Grid.Row="0" Width="30" Height="30" Template="{DynamicResource _controlTemplate_zoomButton}"
+											Margin="3,8,3,3" Background="{StaticResource _drawingBrush_zoomOut}"
+											Click="_button_zoomOut_Click"/>
+
+							<Slider Grid.Row="1" Orientation="Vertical" Margin="8,5,5,5" IsSnapToTickEnabled="True" Foreground="White" 
+											Value="{Binding ElementName=mapMainWindow,Path=Zoom,Mode=TwoWay}"
+											Minimum="{Binding ElementName=mapMainWindow,Path=MinZoom,Mode=OneWay}"
+											Maximum="{Binding ElementName=mapMainWindow,Path=MaxZoom,Mode=OneWay}"/>
+							<Button x:Name="_button_zoomIn"
+											Grid.Row="2" Width="30" Height="30" Template="{DynamicResource _controlTemplate_zoomButton}"
+											Margin="3,3,3,8" Background="{StaticResource _drawingBrush_zoomIn}"
+											Click="_button_zoomIn_Click"/>
+						</Grid>
+					</Border>
+				</Grid>
+
+				<StatusBar Grid.Row="3" Background="{Binding ElementName=windowBackground,Path=Background}" Margin="3">
+					<StatusBar.ItemsPanel>
+						<ItemsPanelTemplate>
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="Auto"></RowDefinition>
+								</Grid.RowDefinitions>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="*"></ColumnDefinition>
+									<ColumnDefinition Width="Auto"></ColumnDefinition>
+									<ColumnDefinition Width="35"></ColumnDefinition>
+									<ColumnDefinition Width="120"></ColumnDefinition>
+									<ColumnDefinition Width="35"></ColumnDefinition>
+									<ColumnDefinition Width="120"></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+							</Grid>
+						</ItemsPanelTemplate>
+					</StatusBar.ItemsPanel>
+
+					<StatusBarItem Grid.Column="0">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">用户名字：</TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="1">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" x:Name="textBlock_UserName" ></TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="2">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">IP地址：</TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="3">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" x:Name="textBlock_IPAddress"></TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="5">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" >当前坐标：</TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="6">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">Lat：</TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="7">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" HorizontalAlignment="Left" x:Name="textBlock_Lat"></TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="8">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">Lng：</TextBlock>
+					</StatusBarItem>
+					<StatusBarItem Grid.Column="9">
+						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" HorizontalAlignment="Left"  x:Name="textBlock_Lng"></TextBlock>
+					</StatusBarItem>
+				</StatusBar>
+
+				<Rectangle x:Name="rightBorder" Width="5" 
+									 Grid.Row="1" Grid.RowSpan="2"
+									 Cursor="SizeWE" 
+									 Fill="Transparent" 
+									 HorizontalAlignment="Right" VerticalAlignment="Stretch"
+									 MouseLeftButtonDown="window_initateWidden" 
+									 MouseLeftButtonUp="window_endWiden"
+									 MouseMove="window_weBorder_widden"/>
+				<Rectangle x:Name="leftBorder" Width="5" 
+									 Grid.Row="1" Grid.RowSpan="2" Cursor="SizeWE" Grid.Column="0"
+									 Fill="Transparent" 
+									 HorizontalAlignment="Left" VerticalAlignment="Stretch"
+									 MouseLeftButtonDown="window_initateWidden" 
+									 MouseLeftButtonUp="window_endWiden"
+									 MouseMove="window_weBorder_widden"/>
+				<Rectangle x:Name="topBorder" Height="5" 
+									 Grid.Row="0" Cursor="SizeNS"
+									 Fill="Transparent" 
+									 MouseLeftButtonDown="window_initateWidden" 
+									 MouseLeftButtonUp="window_endWiden"
+									 MouseMove="window_nsBorder_widden"
+									 HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+				<Rectangle x:Name="buttomBorder" Height="5" 
+									 Grid.Row="3"
+									 Cursor="SizeNS"
+									 Fill="Transparent" 
+									 HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+									 MouseLeftButtonDown="window_initateWidden" 
+									 MouseLeftButtonUp="window_endWiden"
+									 MouseMove="window_nsBorder_widden"/>
+			</Grid>
+		</Border>
+	</Grid>
+</Window>

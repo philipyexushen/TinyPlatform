@@ -1,0 +1,14 @@
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\bin\Debug\ControlsButtonLib.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.csprojResolveAssemblyReference.cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlButtons.g.cs
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib_MarkupCompile.cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib_MarkupCompile.lref
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlButtons.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.g.resources
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.Properties.Resources.resources
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.csproj.GenerateResource.Cache
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.pdb
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\buttonStyles.baml
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\bin\Debug\ControlsButtonLib.dll.config
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\bin\Debug\ControlsButtonLib.dll
+F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\ControlsButtonLib\ControlsButtonLib\obj\Debug\ControlsButtonLib.dll
