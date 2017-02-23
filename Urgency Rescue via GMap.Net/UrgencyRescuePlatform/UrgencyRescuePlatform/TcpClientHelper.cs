@@ -28,7 +28,7 @@ namespace TcpClientHelper
 		/// 创建一个被Helper修饰的消息
 		/// </summary>
 		/// <param name="msg">指定消息</param>
-		public ClientMessageEventArgs(string msg)                                                           
+		public ClientMessageEventArgs(int source, string msg)                                                           
 		{
 			DataMsg = msg;
 		}
@@ -57,6 +57,8 @@ namespace TcpClientHelper
 			return DataMsg;
 		}
 		public string DataMsg { get; private set; }
+
+		public int Source { get; private set; }
 	}
 
 	public class TransformedCoordinateArgs : EventArgs
@@ -89,21 +91,67 @@ namespace TcpClientHelper
 		public int SourceFeatureCode { get; set; }
 	}
 
+	public class HelpEventArgs :EventArgs
+	{
+		/// <summary>
+		/// 创建一个新的HelpEventArgs
+		/// </summary>
+		/// <param name="lat">转换后的lat</param>
+		/// <param name="lng">转换后的lng</param>
+		public HelpEventArgs(double lat, double lng, int sourceFeatureCode)
+		{
+			Point = new PointLatLng(lat, lng);
+			SourceFeatureCode = sourceFeatureCode;
+		}
+
+		/// <summary>
+		/// 创建一个新的HelpEventArgs
+		/// </summary>
+		/// <param name="point">转换后的point</param>
+		public HelpEventArgs(PointLatLng transformedPoint, int sourceFeatureCode)
+		{
+			Point = transformedPoint;
+			SourceFeatureCode = sourceFeatureCode;
+			IsCoordinate = true;
+		}
+
+		/// <summary>
+		/// 创建一个新的HelpEventArgs
+		/// </summary>
+		/// <param name="point">转换后的point</param>
+		public HelpEventArgs(string message, int sourceFeatureCode)
+		{
+			this.Message = message;
+			SourceFeatureCode = sourceFeatureCode;
+			IsCoordinate = false;
+		}
+
+		/// <summary>
+		/// 转换后的坐标点
+		/// </summary>
+		public PointLatLng Point { get; private set; }
+
+		public bool IsCoordinate { get; private set; }
+		public string Message { get; private set; }
+
+		public int SourceFeatureCode { get; set; }
+	} 
+
 	/// <summary>
 	/// AsyncTcpClientHelper给TcpClientCore做信息包装，外部只暴露信息传输的事件接口
 	/// 可定义各种其他的信息处理方式
 	/// </summary>
-	public class AsyncTcpClientHelper : IDisposable
+	public class AsyncTcpClientHelper
 	{
 		public event EventHandler<ClientMessageEventArgs> DataOccuredEvent;
-		public event EventHandler<ClientMessageEventArgs> ConnectionToServerFailedEvent;
+		public event EventHandler<ClientMessageEventArgs> DisconnecEvent;
+		public event EventHandler<ClientMessageEventArgs> ConenctedSuccessfulEvent;
 		public event EventHandler<NewUserDetailsArgs> NewUserConnectedEvent;
+		public event EventHandler<UserLogoutArgs> UserLogoutEvent;
 		public event EventHandler<TransformedCoordinateArgs> NewCoordinateOccuredEvent;
+		public event EventHandler<HelpEventArgs> HelpEvent;
 
-		/// <summary>
-		/// 当与服务器丢失连接时尝试重连的次数
-		/// </summary>
-		public uint MaxReconnectionRetries { get; set; } = 10;
+		public bool IsAllowAutoReconnect { get; set; } = true;
 
 		/// <summary>
 		/// 创建一个新的客户端助手
@@ -111,72 +159,6 @@ namespace TcpClientHelper
 		public AsyncTcpClientHelper()
 		{
 
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端助手
-		/// </summary>
-		/// <param name="remoteIpEndPoint">远程服务器节点</param>
-		public AsyncTcpClientHelper(string controlerName, IPEndPoint remoteIpEndPoint)
-			: this(controlerName, new IPAddress[] { remoteIpEndPoint.Address }, remoteIpEndPoint.Port)
-		{
-
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端助手
-		/// </summary>
-		/// <param name="address">远程主机地址</param>
-		/// <param name="port">远程服务器端口</param>
-		public AsyncTcpClientHelper(string controlerName, IPAddress remoteIpaddress, int port)
-			: this(controlerName, new IPAddress[] { remoteIpaddress }, port)
-		{
-
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端创建一个新的客户端助手
-		/// </summary>
-		/// <param name="addresses">目标服务器地址</param>
-		/// <param name="port">目标服务器端口</param>
-		public AsyncTcpClientHelper(string controlerName, IPAddress[] remoteIpAddresses, int port)
-		{
-			_clientCore = new AsyncTcpClient(controlerName, remoteIpAddresses, port);
-			InitEventHandler();
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端助手
-		/// </summary>
-		/// <param name="remoteIpEndPoint">远程服务器节点</param>
-		/// <param name="localIpEndPoint">本地客户端节点</param>
-		public AsyncTcpClientHelper(string controlerName, IPEndPoint remoteIpEndPoint, IPEndPoint localIpEndPoint)
-			: this(controlerName, new IPAddress[] { remoteIpEndPoint.Address }, remoteIpEndPoint.Port, localIpEndPoint)
-		{
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端助手
-		/// </summary>
-		/// <param name="address">主机地址</param>
-		/// <param name="port">远程服务器端口</param>
-		/// <param name="localIpEndPoint">本地服务器节点</param>
-		public AsyncTcpClientHelper(string controlerName, IPAddress remoteIpaddress, int port, IPEndPoint localIpEndPoint)
-			: this(controlerName, new IPAddress[] { remoteIpaddress }, port, localIpEndPoint)
-		{
-
-		}
-
-		/// <summary>
-		/// 创建一个新的客户端助手
-		/// </summary>
-		/// <param name="addresses">目标服务器地址</param>
-		/// <param name="port">目标服务器端口</param>
-		/// <param name="localIpEndPoint">本地服务器节点</param>
-		public AsyncTcpClientHelper(string controlerName, IPAddress[] remoteIpAddresses, int port, IPEndPoint localIpEndPoint)
-		{
-			_clientCore = new AsyncTcpClient(controlerName,remoteIpAddresses, port, localIpEndPoint);
-			InitEventHandler();
 		}
 
 		public struct HostArg
@@ -195,24 +177,20 @@ namespace TcpClientHelper
 			}
 		}
 
+		public HostArg Arg { get; private set; }
+		public IPHostEntry IpHostEntrEntry { get; private set; }
+
 		public void StartTcpClientWithHostName(object objArg)
 		{
-			HostArg arg = (HostArg)objArg;
+			Arg = (HostArg)objArg;
 			try
 			{
-				IPHostEntry ipHostEntrEntry = Dns.GetHostEntry(arg.HostName);//直接同步，反正已经在线程里面了
-
-				if (arg.LocalIpEndPoint != null)
-					_clientCore = new AsyncTcpClient(arg.ControlerName, ipHostEntrEntry.AddressList, arg.Port, arg.LocalIpEndPoint);
-				else
-					_clientCore = new AsyncTcpClient(arg.ControlerName, ipHostEntrEntry.AddressList, arg.Port);
-
-				InitEventHandler();
+				IpHostEntrEntry = Dns.GetHostEntry(Arg.HostName);//直接同步，反正已经在线程里面了
 				this.StartConnect();
 			}
 			catch (Exception e)
 			{
-				ConnectionToServerFailedEvent?.BeginInvoke(this, createDnsFailedEvent(e, arg), null, this);
+				DisconnecEvent?.BeginInvoke(this, createDnsFailedEvent(e, Arg), null, this);
 			}
 		}
 
@@ -221,22 +199,49 @@ namespace TcpClientHelper
 		/// </summary>
 		public void StartConnect()
 		{
-			_clientCore.AsyncConnect();
+			if (Arg.LocalIpEndPoint != null)
+				_clientCore = new AsyncTcpClient(Arg.ControlerName, IpHostEntrEntry.AddressList, Arg.Port, Arg.LocalIpEndPoint);
+			else
+				_clientCore = new AsyncTcpClient(Arg.ControlerName, IpHostEntrEntry.AddressList, Arg.Port);
+			InitEventHandler();
 
-			_connecting = true;
+			_clientCore.AsyncConnect();
 			_connectionCheckTimer.Start();
-			_lastConnectionTime = DateTime.Now;
 		}
 
 		/// <summary>
 		/// 设定启动超时时间
 		/// </summary>
-		public int StartupTimeout { get; set; } = 30000;
+		public int StartupTimeout { get; set; } = 5000;
+
+		/// <summary>
+		/// 设定重新连接时间
+		/// </summary>
+		public int ReconnectTime { get; set; } = 3000;
 
 		/// <summary>
 		/// 关闭并且释放client的资源
 		/// </summary>
-		public void Close() { _clientCore.Close(); }
+		public void Disconnect()
+		{
+			IsAllowAutoReconnect = false;
+			_connectionCheckTimer.Elapsed -= _connectionCheckTimer_Elapsed;
+
+			if (_clientCore != null)
+			{
+				_clientCore.PlainTextReceivedEvent -= clientCore_PlaintextReceived;
+				_clientCore.ConnectedEvent -= clientCore_ServerConnected;
+				//_clientCore.DisConnectedEvent -= clientCore_ServerDisconnected;
+				_clientCore.ServerConnectedExceptionEvent -= clientCore_ServerExceptionOccurred;
+				_clientCore.StartupSucceededEvent -= clientCore_ConnectionSucceeded;
+				_clientCore.NewUserConnectedEvent -= clientCore_NewUserComming;
+				_clientCore.NewCoordinateDataOccuredEvent -= clientCore_NewCoordinateOccured;
+				_clientCore.HelpEvent -= _clientCore_HelpEvent;
+				_clientCore.UserLogoutEvent -= _clientCore_UserLogoutEvent;
+
+				_clientCore.DisConnectClient();
+			}
+		}
 
 		/// <summary>
 		/// 异步写入数据
@@ -250,7 +255,7 @@ namespace TcpClientHelper
 		/// <summary>
 		/// 查看能否写入数据
 		/// </summary>
-		public bool CanWrite { get { return _clientCore.Connected; } }
+		public bool CanWrite { get { return _clientCore.IsConnected; } }
 
 		/// <summary>
 		/// 获取用户名
@@ -258,12 +263,9 @@ namespace TcpClientHelper
 		public string Name { get { return _clientCore.ControlerName; } }
 
 		private AsyncTcpClient _clientCore;
-		private uint _nowRetries = 0;
-		private bool _connecting = false;
 
-		//check时钟专门拿来清除死链接用的
-		private System.Timers.Timer _connectionCheckTimer = new System.Timers.Timer();
-		private DateTime _lastConnectionTime;
+		private System.Timers.Timer _connectionCheckTimer;
+		private System.Timers.Timer _reconnectTimer;
 
 		private void InitEventHandler()
 		{
@@ -271,116 +273,104 @@ namespace TcpClientHelper
 			_clientCore.ConnectedEvent                += clientCore_ServerConnected;
 			_clientCore.DisConnectedEvent             += clientCore_ServerDisconnected;
 			_clientCore.ServerConnectedExceptionEvent += clientCore_ServerExceptionOccurred;
-			_clientCore.ReconnectedExceptionEvent     += clientCore_Reconnected;
 			_clientCore.StartupSucceededEvent		  += clientCore_ConnectionSucceeded;
 			_clientCore.NewUserConnectedEvent         += clientCore_NewUserComming;
 			_clientCore.NewCoordinateDataOccuredEvent += clientCore_NewCoordinateOccured;
+			_clientCore.HelpEvent					  += _clientCore_HelpEvent;
+			_clientCore.UserLogoutEvent				  += _clientCore_UserLogoutEvent;
 			_clientCore.EncodeType                     = UnicodeEncoding.GetEncoding(0);
-
+			
+			_connectionCheckTimer = new System.Timers.Timer();
 			_connectionCheckTimer.Interval = StartupTimeout;
 			_connectionCheckTimer.Elapsed += _connectionCheckTimer_Elapsed;
 		}
 
+		private void _clientCore_UserLogoutEvent(object sender, UserLogoutArgs e)
+		{
+			UserLogoutEvent?.Invoke(this, e);
+		}
+
 		private void clientCore_ServerExceptionOccurred(object sender, TcpServerExceptionOccurredEventArgs e)
 		{
-			string message = $"####异常：{e.ExceptionMessage} ";
-			_clientCore.Close();
-			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(message));
+			_connectionCheckTimer.Stop();
+			_connectionCheckTimer.Close();
+
+			string message = $">>>异常：{e.ExceptionMessage} ";
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(-1,message));
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void clientCore_ServerConnected(object sender, TcpConnectedEventArgs e)
 		{
-			string message = $"####成功连接 ({e.Addresses[0]}:{e.Port}) ...";
-			DataOccuredEvent?.Invoke(this,  new ClientMessageEventArgs(message));
-			_connecting = false;
+			string message = $">>>成功连接 ({e.Addresses[0]}:{e.Port}) ...";
+			ConenctedSuccessfulEvent?.Invoke(this,  new ClientMessageEventArgs(-1, message));
+
+			_connectionCheckTimer.Stop();
+			_connectionCheckTimer.Close();
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void clientCore_ServerDisconnected(object sender, TcpDisconnectedEventArgs e)
 		{
-			_connecting = false;
-			
-			string message = $"~####与远程服务器{e.Addresses[0]}断开连接";
+			string message = $">>>与远程服务器{e.Addresses[0]}断开连接";
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(-1,message));
 
-			_clientCore.Dispose();
-			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(message));
+			if (IsAllowAutoReconnect)
+				StartReconnect();
+			else
+			{
+				_clientCore.DisConnectedEvent -= clientCore_ServerDisconnected;
+				DisconnecEvent?.Invoke(this, new ClientMessageEventArgs());
+				_clientCore = null;
+			}
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
-		private void clientCore_Reconnected(object sender, ReconnectedEventArgs e)
+		private void StartReconnect()
 		{
-			if (!_connecting) 
-			{
-				_connecting = true;
-				_nowRetries++;
+			string message = $">>>{ReconnectTime / 1000}秒后重新连接服务器";
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(-1, message));
 
-				string message 
-					= $"####正在与远程服务器 {e.Addresses[0]} 重新连接"
-					  + $"（次数: {_nowRetries}/{MaxReconnectionRetries}）\n    重连原因：{e.ExceptionMessage}";
+			_reconnectTimer = new System.Timers.Timer();
 
-				var remoteAddresses = e.Addresses;
-				var port = e.Port;
-				var localIPEndPoint = e.IpEndPoint;
-				var controlerName = _clientCore.ControlerName;
+			_reconnectTimer.Interval = ReconnectTime;
+			_reconnectTimer.AutoReset = false;
+			_reconnectTimer.Elapsed += _reconnectTimer_Elapsed;
 
-				DataOccuredEvent?.BeginInvoke(this, new ClientMessageEventArgs(message), null, null);
+			_reconnectTimer.Start();
+		}
 
-				if (_nowRetries != MaxReconnectionRetries)
-				{
-					if (localIPEndPoint != null)
-						_clientCore = new AsyncTcpClient(controlerName, remoteAddresses, port, localIPEndPoint);
-					else
-						_clientCore = new AsyncTcpClient(controlerName, remoteAddresses, port);
-
-					var timeInterval = DateTime.Now - _lastConnectionTime;
-					if (timeInterval < TimeSpan.FromSeconds(5)) 
-						Thread.Sleep(TimeSpan.FromSeconds(5) - timeInterval);
-
-					InitEventHandler();
-					this.StartConnect();
-				}
-				else
-				{
-					_connectionCheckTimer.Stop();
-					_connectionCheckTimer.Close();
-
-					var errorMessage = $"###与远程服务器 {remoteAddresses} 连接失败";
-					DataOccuredEvent?.BeginInvoke(this, new ClientMessageEventArgs(errorMessage), null, null);
-				}
-			}
+		private void _reconnectTimer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			_reconnectTimer.Close();
+			StartConnect();
 		}
 
 		private void _connectionCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			var remoteAddresses = _clientCore.RemoteAddresses;
-			var port = _clientCore.RemotePort;
-			var localIPEndPoint = _clientCore.LocalIpEndPoint;
-			clientCore_ServerExceptionOccurred(this, new TcpServerExceptionOccurredEventArgs(remoteAddresses, port, "与服务器连接超时"));
+			if (!_clientCore.IsConnected)
+			{
+				var addresses = _clientCore.Addresses;
+				var port = _clientCore.Port;
+				TcpServerExceptionOccurredEventArgs arg = new TcpServerExceptionOccurredEventArgs(addresses, port, "与服务器连接超时");
+				clientCore_ServerExceptionOccurred(this, arg);
 
-			_connectionCheckTimer.Stop();
+				_connectionCheckTimer.Stop();
+			}
 		}
 
 		private void clientCore_ConnectionSucceeded(object sender, StartupSucceededEventArgs e)
 		{
-			_connecting = false;
-			_nowRetries = 0;
-
 			_connectionCheckTimer.Stop();
 		}
 
 		private void clientCore_PlaintextReceived(object sender, TcpDatagramReceivedEventArgs<string> e)
 		{
-			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs($"{e.datagram}"));
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(e.Source, $"{e.datagram}"));
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void clientCore_NewUserComming(object sender, NewUserDetailsArgs e)
 		{
 			NewUserConnectedEvent?.Invoke(this, e);
 		}
 
-		[MethodImpl(MethodImplOptions.Synchronized)]
 		private void clientCore_NewCoordinateOccured(object sender, CoordinateInformArgs e)
 		{
 			//PointLatLng point = CoordinateTransformer.transformFromGCJToWGS(new PointLatLng(e.Lat, e.Lng));
@@ -390,65 +380,56 @@ namespace TcpClientHelper
 			s += "Lag: " + point.Lat.ToString();
 			s += "Lng: " + point.Lng.ToString();
 
-			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs($"{s}"));
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(e.SourceFeatureCode, $"{s}"));
 			NewCoordinateOccuredEvent?.Invoke(this, new TransformedCoordinateArgs(point,e.SourceFeatureCode));
 			DebugHelpers.CustomMessageShow($"(Lag : Lng)转换前:{e.Lat}:{e.Lng}  转换后{point.Lat}:{point.Lng}");
+		}
+
+		private void _clientCore_HelpEvent(object sender, HelpInformationArgs e)
+		{
+			PointLatLng point = new PointLatLng(e.Lat, e.Lng);
+			string s = string.Empty;
+			s += $">>>突发一处警报！{DateTime.Now:s}";
+
+			if (e.IsCoordinate)
+			{
+				s += "\n>>>经纬度： ";
+				s += "Lag: " + point.Lat.ToString() + " ";
+				s += "Lng: " + point.Lng.ToString();
+
+				if (e.Message != "")
+					s += $"\n>>>附加信息： {e.Message}";
+
+				HelpEvent?.Invoke(this, new HelpEventArgs(point, e.SourceFeatureCode));
+			}
+			else
+			{
+				s += $"\n>>>附加信息： {e.Message}";
+				HelpEvent?.Invoke(this, new HelpEventArgs(e.Message, e.SourceFeatureCode));
+			}
+				
+			DataOccuredEvent?.Invoke(this, new ClientMessageEventArgs(e.SourceFeatureCode,$"{s}"));
+
 		}
 
 		private ClientMessageEventArgs createDnsFailedEvent(Exception e, HostArg arg)
 		{
 			ClientMessageEventArgs eventArg = new ClientMessageEventArgs();
 			eventArg.AddDateTimeHeaderToMessage();
-			eventArg.AppendDataMessage(string.Format("    解析地址 ( {0}:{1} ) 发生异常 !\n", arg.HostName, arg.Port));
+			eventArg.AppendDataMessage($"    解析地址 ( {arg.HostName}:{arg.Port} ) 发生异常 !\n");
 
 			if (e is SocketException)
 			{
 				SocketException socketException = e as SocketException;
-				eventArg.AppendDataMessage(string.Format("    错误码: {0}\n    错误原因: {1}",
-					socketException.ErrorCode, socketException.Message));
+				eventArg.AppendDataMessage($"    错误码: {socketException.ErrorCode}\n    错误原因: {socketException.Message}");
 			}
 			else if (e is ArgumentException)
 			{
 				ArgumentException argumentException = e as ArgumentException;
-				eventArg.AppendDataMessage(string.Format("    参数错误: {0}",
-						argumentException.HResult));
+				eventArg.AppendDataMessage($"    参数错误: {argumentException.HResult}");
 			}
 
 			return eventArg;
 		}
-
-		#region IDisposable Support
-		private bool _disposedValue = false; // 要检测冗余调用
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!_disposedValue)
-			{
-				if (disposing)
-				{
-					_connectionCheckTimer.Stop();
-					_connectionCheckTimer.Close();
-					_connectionCheckTimer.Dispose();
-				}
-
-				_disposedValue = true;
-			}
-		}
-
-		// TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
-		// ~AsyncTcpClientHelper() {
-		//   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-		//   Dispose(false);
-		// }
-
-		// 添加此代码以正确实现可处置模式。
-		public void Dispose()
-		{
-			// 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-			Dispose(true);
-			// TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
-			// GC.SuppressFinalize(this);
-		}
-		#endregion
 	}
 }

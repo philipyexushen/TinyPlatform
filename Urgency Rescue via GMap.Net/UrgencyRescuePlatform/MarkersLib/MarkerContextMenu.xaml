@@ -4,8 +4,7 @@
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 						 xmlns:local="clr-namespace:MarkersLib"
-						 mc:Ignorable="d" 
-						 Width="300" Height="170">
+						 mc:Ignorable="d" Height="170">
 	<Grid TextOptions.TextFormattingMode="Display">
 		<Border BorderBrush="#FF3488C3" BorderThickness="2" Background="#FFFFFBC0" >
 			<Grid Margin="3">
@@ -29,7 +28,8 @@
 				<TextBlock Grid.Row="1" Grid.Column="0" Text="坐标：" Margin="3" FontWeight="Bold" HorizontalAlignment="Left" />
 				<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Corrdinate_Lat,StringFormat=Lat:  {0}}" HorizontalAlignment="Left" Margin="3"/>
 				<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Corrdinate_Lng,StringFormat=Lng: {0}}" HorizontalAlignment="Left" Margin="3"/>
-				<TextBlock Grid.Row="3" Grid.Column="0" Text="地址：" Margin="3" FontWeight="Bold" HorizontalAlignment="Left"/>
+				<TextBlock Grid.Row="3" Grid.Column="0" Text="地址：" Margin="3" FontWeight="Bold" HorizontalAlignment="Left"
+									 TextWrapping="Wrap"/>
 				<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Path=Address}" HorizontalAlignment="Left" Margin="3"/>
 				<TextBlock Grid.Row="4" Grid.Column="0" Text="速度：" Margin="3" FontWeight="Bold" HorizontalAlignment="Left"/>
 				<TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Path=Rate,StringFormat={}{0:F6}km/h}" 

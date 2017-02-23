@@ -130,7 +130,7 @@
 							<ContentPresenter Grid.Column="1" x:Name="txtHeader" Margin="3,1,5,1" MinWidth="90"
 																RecognizesAccessKey="True" VerticalAlignment="Center" ContentSource="Header"/>
 							<!--右指针-->
-							<Image x:Name="PART_Arrow" Height="8" Width="8" Source="/menuIcons/more(normal).png"/>
+							<Image x:Name="PART_Arrow" Height="8" Width="8" Source="/treeViewItem/treeViewItemMore_Fold.png"/>
 							<!--淡出子集菜单容器-->
 							<Popup x:Name="SubMenuPopup" AllowsTransparency="true" 
 										 IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
@@ -189,7 +189,7 @@
 						<!--子菜单打开状态-->
 						<Trigger Property="IsSubmenuOpen" Value="true" >
 							<Setter TargetName="PART_Arrow" Property="Source" 
-											Value="/menuIcons/more_fold.png"></Setter>
+											Value="/treeViewItem/treeViewItemMore_Unfold.png"></Setter>
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -240,18 +240,142 @@
 		</Setter>
 	</Style>
 
+	<SolidColorBrush x:Key="ScrollBarLineButtonBrush" Color="#FF888D91"/>
+	<SolidColorBrush x:Key="ScrollBarLineButtonHoverBrush" Color="#FF1286A9"/>
+	<SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#FF686868"/>
+	<SolidColorBrush x:Key="ScrollBarThumbHoverBrush" Color="#FFC8C8C8"/>
+	<SolidColorBrush x:Key="StandardBoarderBrush" Color="#FF515151"/>
+	<SolidColorBrush x:Key="StandardBackgroundBrush" Color="#FF252526" />
+
+	<Style x:Key="ScrollBarLineUpButtonStyle" TargetType="{x:Type RepeatButton}">
+		<Setter Property="Focusable" Value="False"></Setter>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Grid>
+						<Path HorizontalAlignment="Center" VerticalAlignment="Center"
+							  Name="triangle" Fill="{StaticResource ScrollBarLineButtonBrush}"
+							  Data="M 0 4 L 8 4 L 4 0 Z"/>
+					</Grid>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="triangle" Property="Fill" 
+									Value="{StaticResource ScrollBarLineButtonHoverBrush}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ScrollBarLineDownButtonStyle" TargetType="{x:Type RepeatButton}">
+		<Setter Property="Focusable" Value="False"></Setter>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Grid>
+						<Path HorizontalAlignment="Center" VerticalAlignment="Center"
+							  Name="triangle" Fill="{StaticResource ScrollBarLineButtonBrush}"
+							  Data="M 0 0 L 8 0 L 4 4 Z"/>
+					</Grid>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="triangle" Property="Fill" 
+									Value="{StaticResource ScrollBarLineButtonHoverBrush}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ScrollBarThumbStyle" TargetType="{x:Type Thumb}">
+		<Setter Property="IsTabStop" Value="False"/>
+		<Setter Property="Focusable" Value="False"/>
+		<Setter Property="Margin" Value="1,0,1,0" />
+		<Setter Property="Background" Value="{StaticResource StandardBackgroundBrush}" />
+		<Setter Property="BorderBrush" Value="{StaticResource StandardBoarderBrush}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Thumb}">
+					<Rectangle Name="thumb" Fill="{StaticResource ScrollBarThumbBrush}"></Rectangle>
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="thumb" Property="Fill" Value="{StaticResource ScrollBarThumbHoverBrush}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ScrollBarPageButtonStyle" TargetType="{x:Type RepeatButton}">
+		<Setter Property="IsTabStop" Value="False"/>
+		<Setter Property="Focusable" Value="False"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type RepeatButton}">
+					<Border Background="Transparent" />
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
+		<Grid Background="#FF3E3E42">
+			<Grid.RowDefinitions>
+				<RowDefinition MaxHeight="18"></RowDefinition>
+				<RowDefinition Height="*"></RowDefinition>
+				<RowDefinition MaxHeight="18"></RowDefinition>
+			</Grid.RowDefinitions>
+
+			<RepeatButton Grid.Row="0" Height="18"
+						  Style="{StaticResource ScrollBarLineUpButtonStyle}"
+						  Command="ScrollBar.LineUpCommand">
+			</RepeatButton>
+
+			<Track Name="PART_Track" Grid.Row="1"
+				   IsDirectionReversed="True">
+				<Track.DecreaseRepeatButton>
+					<RepeatButton Command="ScrollBar.PageUpCommand"
+								  Style="{StaticResource ScrollBarPageButtonStyle}"></RepeatButton>
+				</Track.DecreaseRepeatButton>
+				<Track.Thumb>
+					<Thumb Style="{StaticResource ScrollBarThumbStyle}"/>
+				</Track.Thumb>
+				<Track.IncreaseRepeatButton>
+					<RepeatButton Command="ScrollBar.PageDownCommand"
+								  Style="{StaticResource ScrollBarPageButtonStyle}"></RepeatButton>
+				</Track.IncreaseRepeatButton>
+			</Track>
+
+			<RepeatButton Grid.Row="2" Height="18"
+						  Style="{StaticResource ScrollBarLineDownButtonStyle}"
+						  Command="ScrollBar.LineDownCommand">
+			</RepeatButton>
+		</Grid>
+	</ControlTemplate>
+
+	<Style TargetType="{x:Type ScrollBar}">
+		<Setter Property="SnapsToDevicePixels" Value="True"></Setter>
+		<Setter Property="OverridesDefaultStyle" Value="True"></Setter>
+		<Setter Property="Width" Value="18"></Setter>
+		<Setter Property="Height" Value="Auto"></Setter>
+		<Setter Property="Template" Value="{StaticResource VerticalScrollBar}"></Setter>
+	</Style>
+
 	<SolidColorBrush x:Key="treeviewTextForeground" Color="White"/>
 	<SolidColorBrush x:Key="treeViewItemSelectedBackground" Color="#FFA09F9F"/>
 	<SolidColorBrush x:Key="treeViewItemSelectedActiveBackground" Color="#FF007ACC"/>
+	<SolidColorBrush x:Key="logoutTreeViewItemBackground" Color="#FFD68D07"/>
 	<sys:Double x:Key="treeViewToggleIconSize">10</sys:Double>
 
 	<!--TreeViewItem默认样式-->
-	<Style  x:Key="DefaultTreeViewItem" TargetType="{x:Type TreeViewItem}">
-		<Setter Property="MinHeight" Value="25" />
+	<Style  x:Key="BaseedTreeViewItem" TargetType="{x:Type TreeViewItem}">
 		<Setter Property="Foreground" Value="{StaticResource treeviewTextForeground}" />
-		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="SnapsToDevicePixels" Value="True" />
-		<Setter Property="Margin" Value="0" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type TreeViewItem}">
@@ -279,7 +403,7 @@
 										</ControlTemplate>
 									</ToggleButton.Template>
 									<ToggleButton.Content>
-										<Image x:Name="ExpanderIcon" Source="/menuIcons/more_fold.png" 
+										<Image x:Name="ExpanderIcon" Source="/treeViewItem/treeViewItemMore_Fold.png" 
 													 Height="{StaticResource treeViewToggleIconSize}"
 													 Width="{StaticResource treeViewToggleIconSize}"/>
 									</ToggleButton.Content>
@@ -298,7 +422,7 @@
 							<Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
 						</Trigger>
 						<Trigger Property="IsExpanded" Value="True">
-							<Setter TargetName="ExpanderIcon" Property="Source" Value="/menuIcons/more_unfold.png" />
+							<Setter TargetName="ExpanderIcon" Property="Source" Value="/treeViewItem/treeViewItemMore_Unfold.png" />
 						</Trigger>
 						<Trigger Property="HasItems" Value="False">
 							<Setter TargetName="ExpanderIcon" Property="Visibility" Value="Hidden" />
@@ -320,5 +444,100 @@
 		<Style.Triggers>
 		</Style.Triggers>
 	</Style>
+
+	<Style x:Key="DefaultTreeViewItem" TargetType="{x:Type TreeViewItem}"
+				 BasedOn="{StaticResource BaseedTreeViewItem}">
+		<Setter Property="Background" Value="Transparent" />
+	</Style>
+
+	<Style x:Key="LogoutTreeViewItem" TargetType="{x:Type TreeViewItem}"
+				 BasedOn="{StaticResource BaseedTreeViewItem}">
+		<Setter Property="Background" Value="{StaticResource logoutTreeViewItemBackground}" />
+	</Style>
+	<Style x:Key="FocusVisual">
+		<Setter Property="Control.Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<SolidColorBrush x:Key="_style_blackButtonMouseOver" Color="#FF6C6C6C"/>
+	<SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+	<SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+	<SolidColorBrush x:Key="_style_blackButtonPressed" Color="#FF0083C7"/>
+	<SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+	<SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+	<Style x:Key="_style_toggleButton_openInputBox" TargetType="{x:Type ToggleButton}">
+		<Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+		<Setter Property="BorderBrush" Value="White"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="3"/>
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type ToggleButton}">
+					<Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" Background="#FF3D3C3C" Padding="10,3">
+						<ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+					</Border>
+					<ControlTemplate.Triggers>
+						<Trigger Property="Button.IsDefaulted" Value="true">
+							<Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+						</Trigger>
+						<Trigger Property="IsMouseOver" Value="true">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource _style_blackButtonMouseOver}"/>
+						</Trigger>
+						<Trigger Property="IsPressed" Value="true">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource _style_blackButtonPressed}"/>
+						</Trigger>
+						<Trigger Property="IsEnabled" Value="false">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+							<Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="_style_button_openInputBox" TargetType="{x:Type Button}">
+		<Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+		<Setter Property="BorderBrush" Value="White"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="8,3,3,3"/>
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Button}">
+					<Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true" Background="#FF3D3C3C" Padding="10,3">
+						<ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+					</Border>
+					<ControlTemplate.Triggers>
+						<Trigger Property="Button.IsDefaulted" Value="true">
+							<Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+						</Trigger>
+						<Trigger Property="IsMouseOver" Value="true">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource _style_blackButtonMouseOver}"/>
+						</Trigger>
+						<Trigger Property="IsPressed" Value="true">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource _style_blackButtonPressed}"/>
+						</Trigger>
+						<Trigger Property="IsEnabled" Value="false">
+							<Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+							<Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
 
 </ResourceDictionary>

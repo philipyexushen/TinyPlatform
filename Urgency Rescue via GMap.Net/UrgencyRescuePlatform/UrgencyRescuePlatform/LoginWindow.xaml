@@ -60,9 +60,14 @@
 	</Window.Resources>
 	<Window.CommandBindings>
 		<CommandBinding Command="local:LoginCommand.Login"
-															CanExecute="login_CanExecute"
-															Executed="login_Executed">
+										CanExecute="login_CanExecute"
+										Executed="login_Executed">
 		</CommandBinding>
+
+		<CommandBinding Command="local:UpdateAddressCommand.UpdateAddress"
+										CanExecute="UpdateAddressCommand_CanExecute"
+										Executed="CommandBinding_Executed"/>
+
 	</Window.CommandBindings>
 	<Border Margin="3">
 		<Grid UseLayoutRounding="True">
@@ -147,6 +152,8 @@
 											BorderThickness="0"
 											Height="25" 
 											Width="25" 
+											Command="local:UpdateAddressCommand.UpdateAddress"
+											CommandTarget="{Binding ElementName=win}"
 										  Template="{DynamicResource template_IpsearchIcon}"
 											Click="_button_searchIp_Click">
 							</Button>

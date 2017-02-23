@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Text;
-using System.Globalization;
 using System.Timers;
-using System.Reflection.Emit;
-using System.Threading;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using DebugHelperNameSpace;
+using System.Collections;
 using System.Runtime.InteropServices;
 using static TcpClientCore.TcpDatagram;
+using System.Collections.Generic;
 
 namespace TcpClientCore
 {
-	//TODO:解决TCP发送大数据的问题，优化client的结构
-
 	public class TcpDatagram
 	{
 		/// <summary>
@@ -43,8 +37,12 @@ namespace TcpClientCore
 			ACK = 128,
 			//坐标位置
 			Coordinate = 256,
+			//求救信息
+			Help = 512,
+			//ACK应答心跳包
+			ACKPulse = 1024,
 			//其他我还没想好的信息
-			Other = 512
+			Other = 2048
 		}
 
 		/// <summary>
@@ -158,7 +156,7 @@ namespace TcpClientCore
 		/// <param name="numberOfRecievedBytes">信息大小</param>
 		/// <param name="headerFrame">帧</param>
 		/// <param name="recievedByte">报文</param>
-		public static bool PrasePacking
+		public static void PrasePacking
 			(byte[] datagram, int numberOfRecievedBytes, ref DatagramHeaderFrame headerFrame, ref byte[] recievedByte)
 		{
 			int FrameSize = Marshal.SizeOf(typeof(DatagramHeaderFrame));
@@ -166,26 +164,56 @@ namespace TcpClientCore
 			byte[] header = new byte[FrameSize];
 			recievedByte = new byte[numberOfRecievedBytes - FrameSize];
 
-			Buffer.BlockCopy(datagram, 0, header, 0, FrameSize);
+			PraseHeader(datagram, ref headerFrame);
+			Buffer.BlockCopy(datagram, FrameSize, recievedByte, 0, numberOfRecievedBytes - FrameSize);
+		}
+
+		/// <summary>
+		/// 拆解帧头
+		/// </summary>
+		/// <param name="bytes"></param>
+		/// <param name="headerFrame"></param>
+		public static void PraseHeader(byte[] bytes, ref DatagramHeaderFrame headerFrame)
+		{
+			int FrameSize = Marshal.SizeOf(typeof(DatagramHeaderFrame));
+
+			byte[] header = new byte[FrameSize];
+			Buffer.BlockCopy(bytes, 0, header, 0, FrameSize);
 
 			headerFrame = (DatagramHeaderFrame)BytesToStruct(header, typeof(DatagramHeaderFrame));
-
-			if (numberOfRecievedBytes != FrameSize + headerFrame.MessageLength)
-				return false;
-			Buffer.BlockCopy(datagram, FrameSize, recievedByte, 0, numberOfRecievedBytes - FrameSize);
-			return true;
 		}
 	}
 
 	/// <summary>
 	/// 根据NET.Framework来封装的高性能的客户端
 	/// </summary>
-	internal class AsyncTcpClient : TcpClient, IDisposable
+	internal class AsyncTcpClient
 	{
-		private System.Timers.Timer _pulseTimer = new System.Timers.Timer();
+		private TcpClient _client;
+		private Timer _pulseTimer;
+
+		private bool _isACKChecked = false, _isWriting = false;
+
 		private bool _firstServerACK = false;
-		private bool _diposingValue = false;
-		private bool _isDataSending = false;
+		bool _waitingForWholeData = false;
+		int _targetLength = 0;
+		DatagramHeaderFrame _headerFrame = new DatagramHeaderFrame();
+
+		//recieved byte为接受数据的整体缓冲，每次建立大小为messageLength大小
+		private List<byte> _currentBytes = new List<byte>();
+		private bool _isReading = false;
+		private int _readCount = 0;
+
+		//这个值拿来指示是否需要心跳包
+		private int _lastReadCountBeforePulse = 0;
+		private bool _isForcePulse = false;
+
+		private void incReadCount()
+		{
+			if (_readCount == int.MaxValue)
+				_readCount = 0;
+			_readCount++;
+		} 
 
 		/// <summary>
 		/// 创建一个新的客户端
@@ -193,7 +221,6 @@ namespace TcpClientCore
 		/// <param name="addresses">目标服务器地址</param>
 		/// <param name="port">目标服务器端口</param>
 		public AsyncTcpClient(string controlerName, IPAddress[] remoteIpAddresses, int port)
-			: base()
 		{
 			InitAll(controlerName,remoteIpAddresses, port, null);
 		}
@@ -206,35 +233,29 @@ namespace TcpClientCore
 		/// <param name="localIpEndPoint">本地服务器节点</param>
 		/// 
 		public AsyncTcpClient(string controlerName, IPAddress[] remoteIpAddresses, int port, IPEndPoint localIpEndPoint)
-			:base(localIpEndPoint)
 		{
 			InitAll(controlerName, remoteIpAddresses, port, localIpEndPoint);
-
 		}
 
 		private void InitAll(string controlerName, IPAddress[] remoteIpAddresses, int port, IPEndPoint localIpEndPoint)
 		{
-			this.RemoteAddresses = remoteIpAddresses;
-			this.RemotePort = port;
+			this.Addresses = remoteIpAddresses;
+			this.Port = port;
 			this.LocalIpEndPoint = null;
 			this.EncodeType = Encoding.Unicode;
 			this.ControlerName = controlerName;
-
-			_pulseTimer.Interval = PulseIntervalTime;
-			_pulseTimer.AutoReset = true;
-			_pulseTimer.Elapsed += PulseTimer_Elapsed;
 		}
 
 		#region Properties
 		/// <summary>
 		/// 远端服务器的IP地址列表
 		/// </summary>
-		public IPAddress[] RemoteAddresses { get; private set; }
+		public IPAddress[] Addresses { get; private set; }
 
 		/// <summary>
 		/// 远程服务器端口
 		/// </summary>
-		public int RemotePort { get; private set; }
+		public int Port { get; private set; }
 
 		/// <summary>
 		/// 获取socket的心跳包时间
@@ -256,137 +277,223 @@ namespace TcpClientCore
 		/// </summary>
 		public string ControlerName { get; private set; }
 
+		public bool IsConnected { get; private set; }
+
 		#endregion Properties
 
 		#region Methods
+
+		private void StartPulseTimer()
+		{
+			_pulseTimer = new Timer();
+
+			_pulseTimer.Interval = PulseIntervalTime;
+			_pulseTimer.AutoReset = true;
+			_pulseTimer.Elapsed += PulseTimer_Elapsed;
+			_pulseTimer.Start();
+		}
+
+		private void StopPulseTimer()
+		{
+			if (_pulseTimer != null)
+			{
+				_pulseTimer.AutoReset = false;
+				_pulseTimer.Elapsed -= PulseTimer_Elapsed;
+				_pulseTimer.Stop();
+			}
+		}
 
 		/// <summary>
 		/// 连接远程服务器
 		/// </summary>
 		/// <returns></returns>
-		public AsyncTcpClient AsyncConnect()
+		public bool AsyncConnect()
 		{
-			if (!Connected)
+			_client = new TcpClient();
+
+			bool isValid = false;
+			if (!IsConnected)
 			{
 				try
 				{
-					BeginConnect(RemoteAddresses[0], RemotePort, HandleTcpServerConnected, this);
+					_client.BeginConnect(Addresses[0], Port, HandleTcpServerConnected, this);
+					isValid = true;
 				}
 				catch(Exception e)
 				{
-					RaiseServerConnectedExceptionEvent(RemoteAddresses, RemotePort,e.Message);
-					RaiseReconnectedEvent(RemoteAddresses, RemotePort, e.Message);
+					RaiseServerConnectedExceptionEvent(Addresses, Port, e.Message);
+					RaiseDisConnectedEvent(Addresses, Port);
 				}
 			}
-			return this;
-		}
-
-		/// <summary>
-		/// 关闭远程服务器
-		/// </summary>
-		/// <returns></returns>
-		public new AsyncTcpClient Close()
-		{
-			base.Close();
-
-			_pulseTimer.Stop();
-			_pulseTimer.Close();
-
-			RaiseDisConnectedEvent(RemoteAddresses, RemotePort);
-
-			return this;
+			return isValid;
 		}
 
 		private void HandleTcpServerConnected(IAsyncResult result)
 		{
 			try
 			{
-				this.EndConnect(result);
-				RaiseConnectedEvent(RemoteAddresses, RemotePort);
+				_client.EndConnect(result);
+				
+				byte[] buffer = new byte[_client.ReceiveBufferSize];
+				_client.GetStream().BeginRead(buffer, 0, _client.ReceiveBufferSize, HandleDatagramReceived, buffer);
+				RaiseConnectedEvent(Addresses, Port);
+				_isACKChecked = true;
 
-				//如果连接成功，则重新接受信息
-				//如果接受信息失败，立马重连
-				byte[] buffer = new byte[ReceiveBufferSize];
-				GetStream().BeginRead(buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
-
-				_pulseTimer.Start();
-				WriteData(ControlerName, MessageType.DeviceLogIn);
-
+				StartPulseTimer();
 				//当登陆成功，发送登陆信息	
+				WriteData(ControlerName, MessageType.DeviceLogIn);	
 			}
-			catch(Exception e)
+			catch(Exception)
 			{
-				RaiseReconnectedEvent(RemoteAddresses, RemotePort, e.Message);
+				//这个时候会发生上一个被销毁的socket的异步对象IAsyncResult没执行的异常，忽略就可以了
+				//因为上一个对象已经被回收了
 			}
+			IsConnected = true;
 		}
 
+		//传大数据时，会发生TCP粘包，请注意
 		private void HandleDatagramReceived(IAsyncResult ar)
 		{
+			DebugHelpers.CustomMessageShow("begin Read");
+			byte[] buffer = (byte[])ar.AsyncState;
+			
 			try
 			{
+				_isReading = true;
+				int numberOfRecievedBytes;
+
 				int FrameSize = Marshal.SizeOf(typeof(DatagramHeaderFrame));
 
-				var stream = GetStream();
-				int numberOfRecievedBytes = 0;
+				var stream = _client.GetStream();
 				numberOfRecievedBytes = stream.EndRead(ar);
 
-				if (numberOfRecievedBytes == 0)
+				DebugHelpers.CustomMessageShow($"numberOfRecievedBytes{numberOfRecievedBytes}");
+
+				if (numberOfRecievedBytes == 0 && IsConnected)
 				{
-					RaiseReconnectedEvent(RemoteAddresses, RemotePort, "与服务器意外断开连接");
-					_pulseTimer.Stop();
+					RaiseServerConnectedExceptionEvent(Addresses, Port, "与服务器断开连接");
+					RaiseDisConnectedEvent(Addresses, Port);
 					return;
 				}
 
-				DatagramHeaderFrame headerFrame = new DatagramHeaderFrame();
-				byte[] datagramBytes = new byte[0];
+				byte[] bytes = new byte[numberOfRecievedBytes];
+				Buffer.BlockCopy(buffer, 0, bytes, 0, numberOfRecievedBytes);
+				//把当前读到的数据全部传到大的缓冲区中
+				_currentBytes.AddRange(bytes);
 
-				byte[] datagramBuffer = (byte[])ar.AsyncState;
-				byte[] recievedBytes = new byte[numberOfRecievedBytes];
-
-				Buffer.BlockCopy(datagramBuffer, 0, recievedBytes, 0, numberOfRecievedBytes);
-
-				if (numberOfRecievedBytes >= FrameSize) 
+				while (_currentBytes.Count >= FrameSize)
 				{
-					if (PrasePacking(recievedBytes, numberOfRecievedBytes, ref headerFrame, ref datagramBytes))
+					DebugHelpers.CustomMessageShow($"_currentBytesCount{_currentBytes.Count}");
+					if (!_waitingForWholeData)
 					{
-						if (headerFrame.MsgType == MessageType.PulseFacility) 
+						//如果不是当前处于接收全部数据的状态，则读取帧头
+
+						byte[] headerBytes = new byte[FrameSize];
+						_currentBytes.CopyTo(0, headerBytes, 0, FrameSize);
+						PraseHeader(headerBytes, ref _headerFrame);
+
+						_targetLength = _headerFrame.MessageLength + FrameSize;
+						_waitingForWholeData = true;
+
+						DebugHelpers.CustomMessageShow($"targetLength{_targetLength}");
+					}
+
+					if (_currentBytes.Count >= _targetLength)
+					{
+						List<byte> restBytes = new List<byte>();
+						//注意这里会存在一个很大的问题，如果_currentBytes.Count == _targetLength，不能GetRange，
+						//因为_targetLength元素不存在
+
+						DebugHelpers.CustomMessageShow($"begin handle");
+						if (_currentBytes.Count > _targetLength)
 						{
-							DebugHelpers.CustomMessageShow(EncodeType.GetString(datagramBytes));
-							if (!_firstServerACK)
-							{
-								_firstServerACK = true;
-								RaiseStartupSuccessed(RemoteAddresses, RemotePort);
-							}
-							
+							restBytes = _currentBytes.GetRange(_targetLength, _currentBytes.Count - _targetLength);
+							_currentBytes.RemoveRange(_targetLength, _currentBytes.Count - _targetLength);
 						}
-						else if(headerFrame.MsgType == MessageType.ServerTest)
-						{
-							RaiseDatagramRecievedEvent(this, headerFrame, datagramBytes);
-							RaisePlainTextReceivedEvent(this, headerFrame, datagramBytes);
-							WriteData("ACK back!", MessageType.ServerTest);
-						}
-						else if(headerFrame.MsgType == MessageType.PlainMessage)
-						{
-							RaiseDatagramRecievedEvent(this, headerFrame, datagramBytes);
-							RaisePlainTextReceivedEvent(this, headerFrame, datagramBytes);
-						}
-						else if(headerFrame.MsgType == MessageType.DeviceLogIn)
-						{
-							RaiseNewUserCommingEvent("", headerFrame.SourceFeatureCode, datagramBytes);
-						}
-						else if(headerFrame.MsgType == MessageType.Coordinate)
-						{
-							RaiseNewCoordinateOccuredEvent(headerFrame.SourceFeatureCode, datagramBytes);
-						}
+
+						//去除帧头
+						_currentBytes.RemoveRange(0, FrameSize);
+						DebugHelpers.CustomMessageShow($"end handle");
+
+						byte[] a = new byte[0];
+						handleRecivedMessage(_currentBytes.ToArray());
+
+						_currentBytes = restBytes;
+						_waitingForWholeData = false;
+
+						DebugHelpers.CustomMessageShow($"targetLength{_targetLength}");
+						DebugHelpers.CustomMessageShow($"after read{_currentBytes.Count}");
+
+						if (_currentBytes.Count == 0)
+							_isReading = false;
+					}
+					else
+					{
+						_waitingForWholeData = true;
+						break;//必须break，当_currentBytes.Count不够_targetLength但又大于FrameSize时，会死循环
 					}
 				}
-
-				GetStream().BeginRead(datagramBuffer, 0, datagramBuffer.Length, HandleDatagramReceived, datagramBuffer);
+				_client.GetStream().BeginRead(buffer, 0, buffer.Length, HandleDatagramReceived, buffer);
+				DebugHelpers.CustomMessageShow("end Read");
 			}
-			catch (Exception e)
+			catch (IndexOutOfRangeException e)
 			{
-				RaiseServerConnectedExceptionEvent(RemoteAddresses, RemotePort, e.Message);
-				RaiseReconnectedEvent(RemoteAddresses, RemotePort, e.Message);
+				DebugHelpers.CustomMessageShow(e.Message);
+			}
+			catch(Exception e)
+			{
+				DebugHelpers.CustomMessageShow(e.Message);
+				_isReading = false;
+			}
+			finally
+			{
+				incReadCount();
+			}
+		}
+
+		private void handleRecivedMessage(byte[] recievedBytes)
+		{
+			if (_headerFrame.MsgType == MessageType.PulseFacility)
+			{
+				if (!_firstServerACK)
+				{
+					_firstServerACK = true;
+					RaiseStartupSuccessed(Addresses, Port);
+				}
+			}
+			else if (_headerFrame.MsgType == MessageType.ServerTest)
+			{
+				RaiseDatagramRecievedEvent(_headerFrame.SourceFeatureCode,_headerFrame, recievedBytes);
+				RaisePlainTextReceivedEvent(_headerFrame.SourceFeatureCode, _headerFrame, recievedBytes);
+
+				RaiseHelpEvent(_headerFrame.SourceFeatureCode, recievedBytes);//测试
+				WriteData("ACK back!", MessageType.ServerTest);
+			}
+			else if (_headerFrame.MsgType == MessageType.PlainMessage)
+			{
+				RaiseDatagramRecievedEvent(_headerFrame.SourceFeatureCode, _headerFrame, recievedBytes);
+				RaisePlainTextReceivedEvent(_headerFrame.SourceFeatureCode, _headerFrame, recievedBytes);
+			}
+			else if (_headerFrame.MsgType == MessageType.DeviceLogIn)
+			{
+				RaiseNewUserCommingEvent("", _headerFrame.SourceFeatureCode, recievedBytes);
+			}
+			else if (_headerFrame.MsgType == MessageType.Coordinate)
+			{
+				RaiseNewCoordinateOccuredEvent(_headerFrame.SourceFeatureCode, recievedBytes);
+			}
+			else if (_headerFrame.MsgType == MessageType.ACKPulse)
+			{
+				_isACKChecked = true;
+			}
+			else if (_headerFrame.MsgType == MessageType.Help)
+			{
+				RaiseHelpEvent(_headerFrame.SourceFeatureCode, recievedBytes);
+			}
+			else if (_headerFrame.MsgType == MessageType.DeviceLogOut)
+			{
+				RaiseUserLogoutEvent(_headerFrame.SourceFeatureCode);
+				DebugHelpers.CustomMessageShow("Logout inform occured");
 			}
 		}
 
@@ -394,24 +501,46 @@ namespace TcpClientCore
 		{
 			try
 			{
-				this.GetStream().EndWrite(ar);
+				_client.GetStream().EndWrite(ar);
 			}
-			catch(Exception e)
+			catch(Exception)
 			{
-				RaiseServerConnectedExceptionEvent(RemoteAddresses, RemotePort, e.Message);
-				RaiseReconnectedEvent(RemoteAddresses, RemotePort, e.Message);
+				//RaiseServerConnectedExceptionEvent(Addresses, Port, e.Message);
+				//RaiseDisConnectedEvent(Addresses, Port);
 			}
 		}
 
 		private void PulseTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			if (!_isDataSending) 
-				WriteData("", TcpDatagram.MessageType.PulseFacility);
-		}
+			if (_isForcePulse && _lastReadCountBeforePulse == _readCount)
+			{
+				RaiseServerConnectedExceptionEvent(Addresses, Port, "服务器响应过慢");
+				RaiseDisConnectedEvent(Addresses, Port);
+				return;
+			}
+			else
+				_isForcePulse = false;
 
-		private void ConnectingTimeout_Elapsed(object sender, ElapsedEventArgs e)
-		{
-			RaiseReconnectedEvent(RemoteAddresses, RemotePort, "连接远程服务器超时");
+			if (!_isWriting && !_isReading && IsConnected)
+			{
+				if (!_isACKChecked)
+				{
+					RaiseServerConnectedExceptionEvent(Addresses, Port, "服务器响应超时");
+					RaiseDisConnectedEvent(Addresses, Port);
+					return;
+				}
+				else
+				{
+					WriteData("", TcpDatagram.MessageType.PulseFacility);
+					_isACKChecked = false;
+				}
+			}
+			else
+			{
+				_lastReadCountBeforePulse = _readCount;
+				_isForcePulse = true;
+				_isACKChecked = true;
+			}
 		}
 
 		/// <summary>
@@ -422,23 +551,21 @@ namespace TcpClientCore
 		{
 			try
 			{
+				_isWriting = true;
+
 				DatagramHeaderFrame headerFrame = new DatagramHeaderFrame();
 				headerFrame.MsgType = messageType;
 				headerFrame.MessageLength = bytes.Length;
 
 				byte[] datagram = PackingMessageToBytes(headerFrame, bytes);
 
-				GetStream().BeginWrite(datagram, 0, datagram.Length, HandleDatagramWritten, this);
-				_isDataSending = true;
+				_client.GetStream().BeginWrite(datagram, 0, datagram.Length, HandleDatagramWritten, this);
+				_isWriting = false;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
-				RaiseServerConnectedExceptionEvent(RemoteAddresses, RemotePort, e.Message);
-				RaiseReconnectedEvent(RemoteAddresses, RemotePort, e.Message);
-			}
-			finally
-			{
-				_isDataSending = false;
+				//RaiseServerConnectedExceptionEvent(Addresses, Port, e.Message);
+				//RaiseDisConnectedEvent(Addresses, Port);
 			}
 		}
 
@@ -451,22 +578,12 @@ namespace TcpClientCore
 			WriteData(EncodeType.GetBytes(msg), messageType);
 		}
 
-		public new void Dispose()
+		public void DisConnectClient()
 		{
-			Dispose(true);
-		}
-
-		protected override void Dispose(bool disposing)
-		{
-			if (_diposingValue) 
+			if (IsConnected)
 			{
-				if (disposing) 
-				{
-					base.Dispose(disposing);
-					_pulseTimer.Dispose();
-				}
-
-				_diposingValue = true;
+				IsConnected = false;
+				RaiseDisConnectedEvent(Addresses, Port);
 			}
 		}
 
@@ -499,11 +616,6 @@ namespace TcpClientCore
 		public event EventHandler<TcpServerExceptionOccurredEventArgs> ServerConnectedExceptionEvent;
 
 		/// <summary>
-		/// 与服务器的连接重新连接异常事件
-		/// </summary>
-		public event EventHandler<ReconnectedEventArgs> ReconnectedExceptionEvent;
-
-		/// <summary>
 		/// 有一个新的连接端连接到本终端
 		/// </summary>
 		public event EventHandler<NewUserDetailsArgs> NewUserConnectedEvent;
@@ -518,53 +630,52 @@ namespace TcpClientCore
 		/// </summary>
 		public event EventHandler<StartupSucceededEventArgs> StartupSucceededEvent;
 
+		/// <summary>
+		/// 设备下线事件
+		/// </summary>
+		public event EventHandler<UserLogoutArgs> UserLogoutEvent;
+
+		/// <summary>
+		/// 求救信息发生
+		/// </summary>
+		public event EventHandler<HelpInformationArgs> HelpEvent;
+
 		private void RaiseConnectedEvent(IPAddress[] ipAddresses, int port)
 		{
-			ConnectedEvent?.Invoke(this, new TcpConnectedEventArgs(ipAddresses, port));
+			ConnectedEvent?.BeginInvoke(this, new TcpConnectedEventArgs(ipAddresses, port), null, null);
 		}
 
 		private void RaiseDisConnectedEvent(IPAddress[] ipAddresses, int port)
 		{
-			//这里同步调用
-			_pulseTimer.Elapsed -= PulseTimer_Elapsed;
-			_pulseTimer.Stop();
+			_client.Close();
+			IsConnected = false;
+			StopPulseTimer();
 			DisConnectedEvent?.Invoke(this, new TcpDisconnectedEventArgs(ipAddresses, port)); 
 		}
 
 		private void RaiseServerConnectedExceptionEvent(IPAddress[] ipAddresses, int port, string exceptionResult)
 		{
-			_pulseTimer.Elapsed -= PulseTimer_Elapsed;
-			_pulseTimer.Enabled = false;
 			ServerConnectedExceptionEvent?.Invoke(this,
 				new TcpServerExceptionOccurredEventArgs(ipAddresses, port, exceptionResult));
 		}
 
-		private void RaiseDatagramRecievedEvent(AsyncTcpClient client, DatagramHeaderFrame header, byte[] bytes)
+		private void RaiseDatagramRecievedEvent(int source,DatagramHeaderFrame header, byte[] bytes)
 		{
-			TcpDatagramReceivedEventArgs<byte[]> arg = new TcpDatagramReceivedEventArgs<byte[]>(client, header, bytes);
+			TcpDatagramReceivedEventArgs<byte[]> arg = new TcpDatagramReceivedEventArgs<byte[]>(source,header, bytes);
 			DatagramReceivedEvent?.BeginInvoke(this, arg, null, null); 
 		}
 
-		private void RaisePlainTextReceivedEvent(AsyncTcpClient client, DatagramHeaderFrame header, byte[] datagram)
+		private void RaisePlainTextReceivedEvent(int source, DatagramHeaderFrame header, byte[] datagram)
 		{
 			TcpDatagramReceivedEventArgs<string> arg 
-				= new TcpDatagramReceivedEventArgs<string>(client, header, EncodeType.GetString(datagram));
+				= new TcpDatagramReceivedEventArgs<string>(source, header, EncodeType.GetString(datagram));
 			PlainTextReceivedEvent?.BeginInvoke(this, arg, null, null);
-		}
-
-		private void RaiseReconnectedEvent(IPAddress[] ipAddresses, int port, string reconnectResult)
-		{
-			_pulseTimer.Elapsed -= PulseTimer_Elapsed;
-			_pulseTimer.Stop();
-
-			var arg = new ReconnectedEventArgs(ipAddresses, port, LocalIpEndPoint,reconnectResult);
-			ReconnectedExceptionEvent?.Invoke(this, arg);
 		}
 
 		private void RaiseStartupSuccessed(IPAddress[] ipAddresses, int port)
 		{
 			var arg = new StartupSucceededEventArgs(ipAddresses, port);
-			StartupSucceededEvent?.Invoke(this, arg);
+			StartupSucceededEvent?.BeginInvoke(this, arg, null, null);
 		}
 		
 		private void RaiseNewUserCommingEvent(string ip, int sourceFeatureCode, byte[] userName)
@@ -582,6 +693,21 @@ namespace TcpClientCore
 			}
 		}
 
+		private void RaiseHelpEvent(int sourceFeatureCode, byte[] coordinate)
+		{
+			var arg = new HelpInformationArgs(sourceFeatureCode);
+			arg.IsCoordinate = arg.TryPraseCoordinate(EncodeType.GetString(coordinate));
+
+			HelpEvent?.BeginInvoke(this, arg, null, null);
+		}
+
+		private void RaiseUserLogoutEvent(int sourceFeatureCode)
+		{
+			var arg = new UserLogoutArgs(sourceFeatureCode);
+
+			UserLogoutEvent?.BeginInvoke(this, arg, null, null);
+		}
+
 		#endregion Events
 	}
 
@@ -591,16 +717,16 @@ namespace TcpClientCore
 	/// <typeparam name="T">报文类型</typeparam>
 	public class TcpDatagramReceivedEventArgs<T> :EventArgs
 	{
-		public TcpDatagramReceivedEventArgs(TcpClient client, DatagramHeaderFrame frame, T datagram)
+		public TcpDatagramReceivedEventArgs(int source, DatagramHeaderFrame frame, T datagram)
 		{
-			this.tcpClient = client;
 			this.datagram = datagram;
 			this.datagramFrame = frame;
+			this.Source = source;
 		}
 
 		public DatagramHeaderFrame datagramFrame { get; set; }
-		public TcpClient tcpClient { get; private set; }
 		public T datagram { get; private set; }
+		public int Source { get; private set; }
 	}
 
 	/// <summary>
@@ -679,52 +805,10 @@ namespace TcpClientCore
 	}
 
 	/// <summary>
-	/// 与服务器的连接发生重连时的异常参数
+	/// 与服务器的成功连接参数
 	/// </summary>
 	/// <param name="addresses">目标地址</param>
 	/// <param name="port">远程端口</param>
-	/// <param name="exceptionMessgae">重连原因</param>
-	/// <param name="currentTrial">当前尝试重连次数</param>
-	/// <param name="maxTrial">最大重连次数</param>
-	public class ReconnectedEventArgs : EventArgs
-	{
-		public ReconnectedEventArgs (IPAddress[] addresses, int port, IPEndPoint ipEndPoint, string message)
-		{
-			this.Addresses = addresses;
-			this.Port = port;
-			this.ExceptionMessage = message;
-			this.IpEndPoint = ipEndPoint;
-		}
-
-		/// <summary>
-		/// 目标服务器的地址
-		/// </summary>
-		public IPAddress[] Addresses { get; private set; }
-
-		/// <summary>
-		/// 远程服务器的端口
-		/// </summary>
-		public int Port { get; private set; }
-
-		/// <summary>
-		/// 本地节点
-		/// </summary>
-		public IPEndPoint IpEndPoint { get; private set; }
-
-		/// <summary>
-		/// 与远程服务器发生的异常的原因
-		/// </summary>
-		public string ExceptionMessage { get; private set; }
-	}
-
-	/// <summary>
-	/// 与服务器的连接发生重连时的异常参数
-	/// </summary>
-	/// <param name="addresses">目标地址</param>
-	/// <param name="port">远程端口</param>
-	/// <param name="exceptionMessgae">重连原因</param>
-	/// <param name="currentTrial">当前尝试重连次数</param>
-	/// <param name="maxTrial">最大重连次数</param>
 	public class StartupSucceededEventArgs : EventArgs
 	{
 		public StartupSucceededEventArgs(IPAddress[] addresses, int port)
@@ -762,6 +846,19 @@ namespace TcpClientCore
 	}
 
 	/// <summary>
+	/// 设备退出的信息
+	/// </summary>
+	public class UserLogoutArgs : EventArgs
+	{
+		public UserLogoutArgs(int sourceFeatureCode)
+		{
+			this.SourceFeatureCode = sourceFeatureCode;
+		}
+
+		public int SourceFeatureCode { get; private set; }
+	}
+
+	/// <summary>
 	/// 坐标信息
 	/// </summary>
 	public class CoordinateInformArgs :EventArgs
@@ -773,19 +870,27 @@ namespace TcpClientCore
 
 		public bool TryPraseCoordinate(string messgae)
 		{
+			if (messgae == null)
+				return false;
+
 			char[] charsToTrim = { ' ', ',' };
 			string[] strs = messgae.Split();
 
-			double lat, lng;
-			if (!double.TryParse(strs[0].TrimEnd(charsToTrim),out lat))
-				return false;
+			if (strs.GetLength(0) >= 2)
+			{
+				double lat, lng;
+				if (!double.TryParse(strs[0].TrimEnd(charsToTrim), out lat))
+					return false;
 
-			if (!double.TryParse(strs[1].TrimEnd(charsToTrim), out lng))
-				return false;
+				if (!double.TryParse(strs[1].TrimEnd(charsToTrim), out lng))
+					return false;
 
-			this.Lat = lat;
-			this.Lng = lng;
-			return true;
+				this.Lat = lat;
+				this.Lng = lng;
+				return true;
+			}
+			else
+				return false;
 		}
 
 		public int SourceFeatureCode { get; private set; }
@@ -793,4 +898,60 @@ namespace TcpClientCore
 		public double Lng { get; private set; }
 	}
 
+	/// <summary>
+	/// 求助信息
+	/// </summary>
+	public class HelpInformationArgs : EventArgs
+	{
+		public HelpInformationArgs(int sourceFeatureCode)
+		{
+			this.SourceFeatureCode = sourceFeatureCode;
+		}
+
+		public bool TryPraseCoordinate(string messgae)
+		{
+			if (messgae == null)
+				return false;
+
+			char[] charsToTrim = { ' ', ',' };
+			string[] strs = messgae.Split();
+
+			double lat, lng;
+
+			if (strs.GetLength(0) >= 2)
+			{
+				if (!double.TryParse(strs[0].TrimEnd(charsToTrim), out lat))
+				{
+					this.Message = messgae;
+					return false;
+				}
+
+				if (!double.TryParse(strs[1].TrimEnd(charsToTrim), out lng))
+				{
+					this.Message = messgae;
+					return false;
+				}
+
+				this.Lat = lat;
+				this.Lng = lng;
+
+				if (strs.GetLength(0) >= 3)
+				{
+					this.Message = strs[2];
+				}
+				return true;
+			}
+			else
+			{
+				this.Message = messgae;
+				return false;
+			}
+		}
+
+		public bool IsCoordinate { get; set; }
+		public string Message { get; private set; }
+		public int SourceFeatureCode { get; private set; }
+		public double Lat { get; private set; }
+		public double Lng { get; private set; }
+	}
 }

@@ -26,6 +26,8 @@ namespace MarkersLib
 {
 	public class GMapRouteMarker : GMapMarker
 	{
+		public static bool AllowDrag { get; set; }
+
 		private static DrawingImage _normalDrawing;
 		private static DrawingImage _flipedDrawing;
 		private static DrawingImage _startDrawing;
@@ -59,7 +61,8 @@ namespace MarkersLib
 		/// <param name="pos">地点</param>
 		/// <param name="iconWidth">图标宽度</param>
 		/// <param name="iconHeight">图标长度</param>
-		public GMapRouteMarker(PointLatLng pos, double iconWidth, double iconHeight, string userName, bool isOwnbyPlatform = true)
+		public GMapRouteMarker(PointLatLng pos, double iconWidth, double iconHeight, int itemKey,
+			string userName, bool isOwnbyPlatform = true)
 			: base(pos)
 		{
 			this.Corrdinate_Lat = pos.Lat;
@@ -67,9 +70,10 @@ namespace MarkersLib
 			this.Time = DateTime.Now;
 			this.UserName = userName;
 			this.Address = "正在查询...";
+			this.ZIndex = 0;
+			this.ItemKey = itemKey;
 
 			this.IsOwnbyPlatform = isOwnbyPlatform;
-
 			InivilzieIcon(iconWidth, iconHeight);
 		}
 
@@ -119,7 +123,7 @@ namespace MarkersLib
 
 		private void Icon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (IsOwnbyPlatform)
+			if (IsOwnbyPlatform && AllowDrag )
 			{
 				Image icon = (Image)sender;
 				_isDragging = true;
@@ -140,8 +144,8 @@ namespace MarkersLib
 		/// </summary>
 		/// <param name="pos">地点</param>
 		/// <param name="iconSize">图标大小</param>
-		public GMapRouteMarker(PointLatLng pos, Size iconSize, string userName) 
-			:this(pos,iconSize.Width,iconSize.Height, userName)
+		public GMapRouteMarker(PointLatLng pos, Size iconSize, int itemKey, string userName) 
+			:this(pos,iconSize.Width,iconSize.Height, itemKey, userName)
 		{
 		}
 
@@ -149,6 +153,17 @@ namespace MarkersLib
 		/// 显示图标
 		/// </summary>
 		public Image Icon { get; set; } = new Image();
+
+		private int _itemKey;
+		public int ItemKey
+		{
+			get { return _itemKey; }
+			private set
+			{
+				_itemKey = value;
+				OnPropertyChanged(new PropertyChangedEventArgs("ItemKey"));
+			}
+		}
 
 		/// <summary>
 		/// 标识的用户
@@ -306,32 +321,135 @@ namespace MarkersLib
 		public event EventHandler<SetEndPointEventArgs>  SetEndPointEvent;
 		public event EventHandler CancelSetStartPointEvent;
 		public event EventHandler CancelSetEndPointEvent;
+		public event EventHandler ClearMarker;
 
 		private MarkerToolTip _markerToolTip;
 		private double _iconHeight = 0;
 		private double _iconWidth = 0;
 		private bool _isDragging = false;
+		private bool _isWarning = false;
 		private SizeLatLng _dragOffest;
+
+		public void ShowWarning()
+		{
+			_isWarning = true;
+			Icon.Source = _flipedDrawing;
+
+			double heightInc = IconHeight / 6;
+			double widthInc = IconWidth / 6;
+
+			Storyboard _warningStoryBoard = new Storyboard();
+			ElasticEase elasticEaseFunction = new ElasticEase();
+			elasticEaseFunction.Oscillations = 10;
+			elasticEaseFunction.EasingMode = EasingMode.EaseOut;
+
+			DoubleAnimationUsingKeyFrames heightKeyFrameAnimation = new DoubleAnimationUsingKeyFrames();
+
+			EasingDoubleKeyFrame elasticEaseHeightKeyFrame = new EasingDoubleKeyFrame();
+			elasticEaseHeightKeyFrame.Value = IconHeight + heightInc*3;
+			elasticEaseHeightKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200));
+			elasticEaseHeightKeyFrame.EasingFunction = elasticEaseFunction;
+
+			EasingDoubleKeyFrame elasticEaseHeightBackKeyFrame = new EasingDoubleKeyFrame();
+			elasticEaseHeightBackKeyFrame.Value = IconHeight + heightInc;
+			elasticEaseHeightBackKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(2000));
+			elasticEaseHeightBackKeyFrame.EasingFunction = elasticEaseFunction;
+
+			heightKeyFrameAnimation.KeyFrames.Add(elasticEaseHeightKeyFrame);
+			heightKeyFrameAnimation.KeyFrames.Add(elasticEaseHeightBackKeyFrame);
+			heightKeyFrameAnimation.FillBehavior = FillBehavior.HoldEnd;
+
+			DoubleAnimationUsingKeyFrames widthKeyFrameAnimation = new DoubleAnimationUsingKeyFrames();
+
+			EasingDoubleKeyFrame elasticEaseWidthKeyFrame = new EasingDoubleKeyFrame();
+			elasticEaseWidthKeyFrame.Value = IconWidth + widthInc*3;
+			elasticEaseWidthKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200));
+			elasticEaseWidthKeyFrame.EasingFunction = elasticEaseFunction;
+
+			EasingDoubleKeyFrame elasticEaseWidthBackKeyFrame = new EasingDoubleKeyFrame();
+			elasticEaseWidthBackKeyFrame.Value = IconWidth + widthInc;
+			elasticEaseWidthBackKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(2000));
+			elasticEaseWidthBackKeyFrame.EasingFunction = elasticEaseFunction;
+
+			widthKeyFrameAnimation.KeyFrames.Add(elasticEaseWidthKeyFrame);
+			widthKeyFrameAnimation.KeyFrames.Add(elasticEaseWidthBackKeyFrame);
+			widthKeyFrameAnimation.FillBehavior = FillBehavior.HoldEnd;
+
+			ThicknessAnimationUsingKeyFrames marginKeyFrameAnimation = new ThicknessAnimationUsingKeyFrames();
+
+			EasingThicknessKeyFrame elasticEaseMarginKeyFrame = new EasingThicknessKeyFrame();
+			elasticEaseMarginKeyFrame.Value = new Thickness(- widthInc / 2, -heightInc * 3, 0, 0);
+			elasticEaseMarginKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200));
+			elasticEaseMarginKeyFrame.EasingFunction = elasticEaseFunction;
+
+			EasingThicknessKeyFrame elasticEaseMarginBackKeyFrame = new EasingThicknessKeyFrame();
+			elasticEaseMarginBackKeyFrame.Value = new Thickness(-widthInc / 4, -heightInc, 0, 0);
+			elasticEaseMarginBackKeyFrame.KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(2000));
+			elasticEaseMarginBackKeyFrame.EasingFunction = elasticEaseFunction;
+
+			marginKeyFrameAnimation.KeyFrames.Add(elasticEaseMarginKeyFrame);
+			marginKeyFrameAnimation.KeyFrames.Add(elasticEaseMarginBackKeyFrame);
+			marginKeyFrameAnimation.FillBehavior = FillBehavior.HoldEnd;
+
+			Storyboard.SetTargetProperty(heightKeyFrameAnimation, new PropertyPath(Image.HeightProperty));
+			_warningStoryBoard.Children.Add(heightKeyFrameAnimation);
+
+			Storyboard.SetTargetProperty(widthKeyFrameAnimation, new PropertyPath(Image.WidthProperty));
+			_warningStoryBoard.Children.Add(widthKeyFrameAnimation);
+
+			Storyboard.SetTargetProperty(marginKeyFrameAnimation, new PropertyPath(Image.MarginProperty));
+			_warningStoryBoard.Children.Add(marginKeyFrameAnimation);
+
+			heightKeyFrameAnimation.Completed+= _warningStoryBoard_Completed;
+			Icon.BeginStoryboard(_warningStoryBoard);
+		}
+
+		public void HighLightMarker()
+		{
+			this.ZIndex += 1;
+			highLightMarkerPrivate();
+		}
+
+		public void RecoverMarker()
+		{
+			this.ZIndex -= 1;
+			recoverMarkerPrivate();
+		}
+
+		private void _warningStoryBoard_Completed(object sender, EventArgs e)
+		{
+
+		}
 
 		private void Icon_MouseEnter(object sender, MouseEventArgs e)
 		{
-			if (!IsStartPoint && !IsEndPoint)
+			highLightMarkerPrivate();
+		}
+
+		private void Icon_MouseLeave(object sender, MouseEventArgs e)
+		{
+			recoverMarkerPrivate();
+		}
+
+		private void highLightMarkerPrivate()
+		{
+			if (!IsStartPoint && !IsEndPoint && !_isWarning)
 			{
 				Icon.Source = _flipedDrawing;
-				HighlightMarker(Icon, +Icon.Width / 8, +Icon.Height / 8, 200);
+				HighlightMarker(Icon, +IconWidth / 6, +IconHeight / 6, 200);
 
-				_markerToolTip =  new MarkerToolTip();
+				_markerToolTip = new MarkerToolTip();
 				_markerToolTip.DataContext = this;
 				Icon.ToolTip = _markerToolTip;
 			}
 		}
 
-		private void Icon_MouseLeave(object sender, MouseEventArgs e)
+		private void recoverMarkerPrivate()
 		{
-			if (!IsStartPoint && !IsEndPoint)
+			if (!IsStartPoint && !IsEndPoint && !_isWarning)
 			{
 				Icon.Source = _normalDrawing;
-				HighlightMarker(Icon, -Icon.Width / 6, -Icon.Height / 6, 100);
+				HighlightMarker(Icon, -IconWidth / 6, -IconHeight / 6, 100);
 				_markerToolTip = null;
 			}
 		}
@@ -340,6 +458,9 @@ namespace MarkersLib
 		{
 			Popup contextMenu = new Popup();
 			MarkerContextMenu menuPanel = new MarkerContextMenu();
+
+			menuPanel.ClearMarker += MenuPanel_ClearMarker;
+
 			contextMenu.Child = menuPanel;
 			contextMenu.StaysOpen = false;
 			contextMenu.AllowsTransparency = true;
@@ -348,6 +469,11 @@ namespace MarkersLib
 			contextMenu.IsOpen = true;
 
 			contextMenu.DataContext = this;
+		}
+
+		private void MenuPanel_ClearMarker(object sender, RoutedEventArgs e)
+		{
+			ClearMarker?.Invoke(this, e);
 		}
 
 		private void MenuPanel_CancelSetStartPoint()
@@ -371,7 +497,7 @@ namespace MarkersLib
 			Icon.Source = _startDrawing;
 			HighlightMarker(Icon, Icon.Width / 7, Icon.Width / 7, 0);
 
-			Border border = CreateTipShape($"起点： Lat: {Corrdinate_Lat} Lng:{Corrdinate_Lng}",
+			Border border = CreateTipShape($"起点",
 								Brushes.White,
 								new SolidColorBrush(Color.FromArgb(0xFF, 64, 54, 55)),
 								Brushes.White);
@@ -383,7 +509,7 @@ namespace MarkersLib
 		{
 			Icon.Source = _endDrawing;
 			HighlightMarker(Icon, Icon.Width / 7, Icon.Width / 7, 0);
-			Border border = CreateTipShape($"终点： Lat: {Corrdinate_Lat} Lng:{Corrdinate_Lng}",
+			Border border = CreateTipShape($"终点",
 								Brushes.White,
 								new SolidColorBrush(Color.FromArgb(0xFF, 64, 54, 55)),
 								Brushes.White);

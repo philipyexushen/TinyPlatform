@@ -5,22 +5,59 @@
 				xmlns:local="clr-namespace:UrgencyRescuePlatform"
 				xmlns:gmap="clr-namespace:GMap.NET.WindowsPresentation;assembly=GMap.NET.WindowsPresentation"
 				xmlns:gMapCore="clr-namespace:GMap.NET;assembly=GMap.NET.Core"
-				x:Class="UrgencyRescuePlatform.MainWindow"
 				xmlns:r="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
 				xmlns:ctb="clr-namespace:ControlsButtonLib;assembly=ControlsButtonLib"
+				xmlns:sys="clr-namespace:System;assembly=mscorlib"
+				
+				x:Class="UrgencyRescuePlatform.MainWindow"
 				mc:Ignorable="d"
 				Name="platformWindow"
-				Icon="icon.ico"
 				Height="800" Width="1348"
 				Title="TinyPlatform"
+				Icon="icon.ico"
 				WindowStyle="None" AllowsTransparency="True"
 				Background="Transparent" >
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/UrgencyRescuePlatform;component/RibbonIcons.xaml"/>
-				<ResourceDictionary Source="/UrgencyRescuePlatform;component/MainWindowControlsDict.xaml"/>
+				<ResourceDictionary Source="/UrgencyRescuePlatform;component/ControlsDict.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
+
+			<SolidColorBrush x:Key="backgroundColor" Color="#FF4E4E4E"/>
+			<SolidColorBrush x:Key="menuBackgroundColor" Color="#FF1B1B1C"/>
+
+			<local:TypeConveter x:Key="typeConverter"/>
+			<local:NegationConverter x:Key="negationConverter"/>
+			<local:TreeViewItemImageConvrter x:Key="treeViewItemImageConvrter"/>
+			<local:IsExistInMapConverter x:Key="isExistInMapConverter"/>
+			<local:IsLoginConverter x:Key="isLoginConverter"/>
+
+			<ContextMenu x:Key="_contextMenu_mapItems" 
+									 Style="{StaticResource DefaultMenu}"
+									Background="{StaticResource menuBackgroundColor}"
+									SnapsToDevicePixels="True">
+				<MenuItem x:Name="_menuItem_clearItems" Header="清除此项" Click="_menuItem_clearItems_Click"
+									IsEnabled="{Binding Path=IsPlatformItem,Converter={StaticResource negationConverter}}"/>
+			</ContextMenu>
+
+			<ContextMenu x:Key="_contextMenu_markerItems" 
+									 Style="{StaticResource DefaultMenu}"
+									Background="{StaticResource menuBackgroundColor}"
+									SnapsToDevicePixels="True">
+				<MenuItem x:Name="claerMarkerItem" Header="清除标志" Click="claerMarkerItem_Click"
+												IsEnabled="{Binding Path=IsExistInMap}"/>
+				<MenuItem x:Name="reAddMarkerItem" Header="重新添加标志" Click="reAddMarkerItem_Click"
+												IsEnabled="{Binding Path=IsExistInMap,Converter={StaticResource negationConverter}}"/>
+				<MenuItem x:Name="destroyMarkerItem" Header="销毁此标志"
+												Click="destroyMarkerItem_Click"/>
+			</ContextMenu>
+
+			<sys:Double x:Key="itemImageSize">18</sys:Double>
+
+			<SolidColorBrush x:Key="treeViewItemForeGround" Color="White"/>
+			<sys:Double x:Key="treeViewItemFontSize">13</sys:Double>
+			<sys:Double x:Key="treeViewHeaderItemFontSize">14</sys:Double>
 
 			<ObjectDataProvider x:Key="_objectDataProvider_maps" ObjectType="{x:Type local:MapSourceHandler}"
 												  MethodName="GetMaps" IsAsynchronous="True"></ObjectDataProvider>
@@ -41,9 +78,113 @@
 						<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=(Validation.Errors)[0].ErrorContent}"/>
 					</Trigger>
 				</Style.Triggers>
+				<Setter Property="Width" Value="160"/>
+				<Setter Property="Margin" Value="1"/>
+			</Style>
+
+			<HierarchicalDataTemplate DataType="{x:Type local:UserInfo}"
+																ItemsSource="{Binding Path=MarkerList}">
+				<Grid Margin="3">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Image Height="{StaticResource itemImageSize}"
+									 Width="{StaticResource itemImageSize}"
+									 SnapsToDevicePixels="False"
+									 HorizontalAlignment="Center" VerticalAlignment="Center"
+									 Source="/images/mapItemIcon.png">
+					</Image>
+					<TextBlock Grid.Column="1" Text="{Binding Path=IsLogin,Converter={StaticResource isLoginConverter}}"
+										 Margin="3,0,0,0"
+										 Foreground="{StaticResource treeViewItemForeGround}"
+										 FontSize="{StaticResource treeViewHeaderItemFontSize}"/>
+					<TextBlock Grid.Column="2" Text="{Binding Path=UserName}" Margin="8,0,0,0"
+											 Foreground="{StaticResource treeViewItemForeGround}"
+											 FontSize="{StaticResource treeViewHeaderItemFontSize}">
+					</TextBlock>
+				</Grid>
+			</HierarchicalDataTemplate>
+			<HierarchicalDataTemplate DataType="{x:Type local:MarkersWrapper}">
+				<Grid Margin="3">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Image Source="{Binding Path=Type,Converter={StaticResource treeViewItemImageConvrter}}"
+									 SnapsToDevicePixels="False"
+									 Height="{StaticResource itemImageSize}"
+									 Width="{StaticResource itemImageSize}"/>
+					<TextBlock Margin="5,0,0,0"
+											 Grid.Column="1"
+											 Text="{Binding Path=Type,Converter={StaticResource typeConverter}}" 
+											 Foreground="{StaticResource treeViewItemForeGround}"
+											 FontSize="{StaticResource treeViewItemFontSize}"/>
+					<TextBlock Grid.Column="2"
+											Text="{Binding Path=Time,StringFormat={}{0:s}}" 
+											Foreground="{StaticResource treeViewItemForeGround}"
+											FontSize="{StaticResource treeViewItemFontSize}"
+											Margin="8,0,0,0"/>
+					<TextBlock Grid.Column="3"
+											Text="{Binding Path=IsExistInMap,Converter={StaticResource isExistInMapConverter}}"
+											Foreground="{StaticResource treeViewItemForeGround}"
+											FontSize="{StaticResource treeViewItemFontSize}"
+											Margin="8,0,0,0"/>
+				</Grid>
+			</HierarchicalDataTemplate>
+
+			<!--TreeView样式-->
+			<Style x:Key="DefaultTreeView" TargetType="{x:Type TreeView}">
+				<Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+				<Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"></Setter>
+				<Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling" />
+				<Setter Property="ScrollViewer.IsDeferredScrollingEnabled" Value="False" />
+				<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
+				<Setter Property="ItemsPanel">
+					<Setter.Value>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel IsItemsHost="True" IsVirtualizing="True" VirtualizationMode="Recycling"/>
+						</ItemsPanelTemplate>
+					</Setter.Value>
+				</Setter>
+				<EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+				<EventSetter Event="TreeViewItem.MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown"/>
+			</Style>
+
+			<Style x:Key="loginInformTextBox" TargetType="{x:Type TextBox}">
+				<Setter Property="IsReadOnly" Value="True"/>
+				<Setter Property="HorizontalAlignment" Value="Stretch"/>
+				<Setter Property="FontSize" Value="14"/>
+				<Setter Property="Margin" Value="13,0,0,0"/>
+				<Setter Property="Foreground" Value="White"/>
+				<Setter Property="Background" Value="Transparent"/>
+				<Setter Property="BorderThickness" Value="0"/>
+			</Style>
+
+			<Style x:Key="_style_inputBoxAndMeesageBox" TargetType="{x:Type TextBox}">
+				<Setter Property="HorizontalAlignment" Value="Stretch"/>
+				<Setter Property="VerticalAlignment" Value="Stretch"/>
+				<Setter Property="FontSize" Value="12.4"/>
+				<Setter Property="Margin" Value="3"/>
+				<Setter Property="Foreground" Value="White"/>
+				<Setter Property="Background" Value="{StaticResource backgroundColor}"/>
+				<Setter Property="BorderThickness" Value="2"/>
+				<Setter Property="TextWrapping" Value="Wrap"/>
+				<Setter Property="BorderBrush" Value="#FF2CA1DF"/>
+				<Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+				<Setter Property="FontFamily" Value="Microsoft YaHei"/>
+				<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
+				<Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
 			</Style>
 		</ResourceDictionary>
 	</Window.Resources>
+	<Window.Triggers>
+		<EventTrigger RoutedEvent="UIElement.MouseEnter" SourceName="_toggleButton_openInputBox"/>
+		<EventTrigger RoutedEvent="FrameworkElement.Loaded"/>
+	</Window.Triggers>
 	<Window.CommandBindings>
 		<CommandBinding Command="local:AddRouteCommand.AddRoute"
 										CanExecute="addRouteCommand_CanExecute"
@@ -121,16 +262,28 @@
 				<Border Grid.Row="1" ClipToBounds="True">
 					<r:Ribbon x:Name="ribbon" Grid.Row="1" Background="#FF9C9C9C" Margin="3,-22,3,0">
 						<r:Ribbon.ApplicationMenu>
-							<r:RibbonApplicationMenu>
-								<r:RibbonApplicationMenuItem Header="New" ToolTipTitle="Application Menu">
-								</r:RibbonApplicationMenuItem>
-								<r:RibbonApplicationMenuItem Header="_Save">
-									<r:RibbonApplicationMenuItem Header="Save"/>
-									<r:RibbonApplicationMenuItem Header="SaveAs"/>
-								</r:RibbonApplicationMenuItem>
-								<r:RibbonSeparator></r:RibbonSeparator>
-								<r:RibbonApplicationMenuItem Header="About"/>
-								<r:RibbonApplicationMenuItem Header="Exit"/>
+							<r:RibbonApplicationMenu SmallImageSource="icon.ico">
+								<r:RibbonApplicationMenu.AuxiliaryPaneContent>
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition Height="*"/>
+											<RowDefinition Height="Auto"/>
+										</Grid.RowDefinitions>
+										<Image Grid.Row="0" Source="icon.ico" HorizontalAlignment="Center" VerticalAlignment="Center"
+													 Width="80" Height="80" Margin="10"/>
+										<TextBlock Grid.Row="1" Text="TinyPlatform" HorizontalAlignment="Center" VerticalAlignment="Center"
+															 FontWeight="Bold" Margin="5" FontSize="20"/>
+									</Grid>
+								</r:RibbonApplicationMenu.AuxiliaryPaneContent>
+								<r:RibbonApplicationMenuItem Header="关于" ToolTipTitle="关于作者"
+																						 ImageSource="icon.ico"
+																						 Click="aboutMe_Click"/>
+
+								<r:RibbonSeparator/>
+								<r:RibbonApplicationMenuItem Header="关闭" ImageSource="{StaticResource _drawingImage_closeButton}"
+																						 Click="closeButton_Click"/>
+								<r:RibbonApplicationMenuItem Header="退出" ImageSource="{StaticResource _drawingImage_exitButton}"
+																						 Click="exitItem_Click"/>
 							</r:RibbonApplicationMenu>
 						</r:Ribbon.ApplicationMenu>
 						<r:RibbonTab Header="控制" Margin="0">
@@ -176,19 +329,19 @@
 									
 								</r:RibbonControlGroup>
 							</r:RibbonGroup>
-							<r:RibbonGroup Header="地图功能" x:Name="_group_mapfunctions">
+							<r:RibbonGroup Header="地图功能" x:Name="_group_mapfunctions" Padding="3">
 								<r:RibbonControlGroup Margin="3,3,0,3">
 									<r:RibbonTwoLineText Text="Lat:" Margin="0,0,5,0"/>
-									<r:RibbonTextBox x:Name="_ribbonTextBox_lat"
+									<TextBox x:Name="_ribbonTextBox_lat" HorizontalAlignment="Stretch"
 																	 Text="{Binding Path=Lat,
 										ValidatesOnNotifyDataErrors=True,NotifyOnValidationError=True,UpdateSourceTrigger=PropertyChanged}"
-																	 Style="{StaticResource _style_loacateTextBox}"
+																	 Style="{StaticResource _style_loacateTextBox}" 
 																	 />
 								</r:RibbonControlGroup>
 
 								<r:RibbonControlGroup Margin="3,0,0,3" BorderThickness="0">
 									<r:RibbonTwoLineText Text="Lng:" />
-									<r:RibbonTextBox x:Name="_ribbonTextBox_lng"
+									<TextBox x:Name="_ribbonTextBox_lng"
 																	 Text="{Binding Path=Lng,
 										ValidatesOnNotifyDataErrors=True,NotifyOnValidationError=True,UpdateSourceTrigger=PropertyChanged}"
 																	 Style="{StaticResource _style_loacateTextBox}"/>
@@ -233,67 +386,137 @@
 																CommandTarget="{Binding ElementName=platformWindow}"
 																Command="local:GetDirectDistanceCommand.GetDirectDistance"
 																Click="_button_getDirectDistance_Click"/>
+								<r:RibbonToggleButton Label="拖拽控制" x:Name="_toggleButton_allowDrag"
+																			IsChecked="False"
+																			ToolTip="不允许拖拽markers"
+																			SmallImageSource="{StaticResource _drawingImage_dragControl}"
+																			LargeImageSource="{StaticResource _drawingImage_dragControl}"
+																			Click="_toggleButton_allowDrag_Click"/>
 							</r:RibbonGroup>
 
 							<r:RibbonGroup Header="用户">
-									<r:RibbonButton Name="_button_login" Label="登陆" 
+								<r:RibbonButton Name="_button_login" Label="登陆" 
 																	SmallImageSource="{StaticResource loginIcon}" 
 																	LargeImageSource="{StaticResource loginIcon}"
 																	Click="loginButton_Click"/>
-
-									<r:RibbonButton	Name="_button_logout" Label="退出登录" 
+								<r:RibbonButton	Name="_button_logout" Label="退出登录" 
 																	SmallImageSource="{StaticResource logoutIcon}" 
 																	LargeImageSource="{StaticResource logoutIcon}"
 																	IsEnabled="False"
-																	Click="loginButton_Click"/>
-								</r:RibbonGroup>
+																	Click="_button_logout_Click"/>
+								<r:RibbonButton	Name="_button_saveLog" Label="保存日志" 
+																SmallImageSource="{StaticResource _drawingImage_saveLogIcon}" 
+																LargeImageSource="{StaticResource _drawingImage_saveLogIcon}"
+																Click="_button_saveLog_Click"/>
+								<r:RibbonCheckBox x:Name="_checkBox_allowAutoReconnect" Label="掉线重连" 
+																	
+																	Click="_checkBox_allowAutoReconnect_Checked"
+																	IsChecked="True"/>
+							</r:RibbonGroup>
 						</r:RibbonTab>
 					</r:Ribbon>
 				</Border>
 
-				<Grid Grid.Row="2" Margin="3,3,3,0">
+				<Grid Grid.Row="2" Margin="3,3,3,0" >
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="1*"/>
 						<ColumnDefinition Width="1.7*"/>
 					</Grid.ColumnDefinitions>
-					<gmap:GMapControl   Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="2" 
-															x:Name="mapMainWindow"
-															MinZoom="4" MaxZoom="21"
-															VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
-															MouseMove="mapMainWindow_MouseMove" 
-															MouseDoubleClick="mapMainWindow_MouseLeftButtonDown">
+					<gmap:GMapControl Grid.Column="0" Grid.ColumnSpan="2" 
+														x:Name="mapMainWindow"
+														MinZoom="4" MaxZoom="21"
+														VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+														MouseMove="mapMainWindow_MouseMove" 
+														MouseDoubleClick="mapMainWindow_MouseLeftButtonDown">
 					</gmap:GMapControl>
 
-					<Grid x:Name="_grid_infromPanel" Grid.Row="0" Grid.RowSpan="3" Visibility="Collapsed">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="3*"/>
-							<RowDefinition Height="*"/>
-							<RowDefinition Height="Auto"/>
-						</Grid.RowDefinitions>
-						<TextBox x:Name="msgBox" Grid.Row="0" Grid.Column="0" 
-									 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-									 BorderThickness="2"
-									 Margin="3"
-									 AcceptsReturn="True" Background="#FF4E4E4E" Foreground="White" BorderBrush="#FF2CA1DF"
-									 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-										TextOptions.TextFormattingMode="Display"
-									 ScrollViewer.VerticalScrollBarVisibility="Visible"
-									 FontSize="12.4"
-									 ScrollViewer.CanContentScroll="True" FontFamily="Microsoft YaHei"/>
+					<Border Grid.Column="0" x:Name="_border_informPanel">
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
 
-						<TextBox x:Name="inputMsgBox" Grid.Row="1" Grid.Column="0" 
-									 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-									 Margin="3"
-									 BorderThickness="2"
-									 AcceptsReturn="True" Background="#FF4E4E4E" Foreground="White" BorderBrush="#FF2CA1DF"
-									 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-									 TextOptions.TextFormattingMode="Display"
-									 ScrollViewer.VerticalScrollBarVisibility="Visible"
-									 FontSize="12.4"
-									 ScrollViewer.CanContentScroll="True" FontFamily="Microsoft YaHei"/>
-						<Button Grid.Row="2" Grid.Column="0" Margin="3" Content="发送消息" Click="sendMsgBtn_Click"
-										HorizontalAlignment="Right"></Button>
-					</Grid>
+							<Grid Grid.Row="0">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto"/>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="*"/>
+								</Grid.ColumnDefinitions>
+								<Border Grid.Column="0" Grid.ColumnSpan="3" Background="Black" Opacity="0.7"/>
+
+								<Image Height="30" Width="30" Margin="15,3,0,3"
+											 Source="{StaticResource _drawingImage_loginInform}"/>
+								<TextBlock Grid.Column="1" Grid.ColumnSpan="2" FontSize="15" Text="未登录"
+													 Visibility="Visible"
+													 x:Name="_textBlock_waitingLogin"
+													 HorizontalAlignment="Center"
+													 VerticalAlignment="Center"
+													 Foreground="White"/>
+								<Grid Grid.Column="1" Grid.ColumnSpan="2"
+											HorizontalAlignment="Stretch" VerticalAlignment="Center"
+											Margin="11,5,5,5"
+											Visibility="Collapsed"
+											x:Name="_grid_loginInformPanel">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*"/>
+									</Grid.ColumnDefinitions>
+
+									<TextBlock Text="用户名：" Foreground="White" FontSize="15"/>
+									<TextBox Grid.Column="1" x:Name="_textbox_userName" Style="{StaticResource loginInformTextBox}"
+													 Text="{Binding Path=TeminalName}"/>
+									<TextBlock Grid.Column="2" Text="IP：" Foreground="White" FontSize="15"/>
+									<TextBox Grid.Column="3" x:Name="_textBox_IP" Style="{StaticResource loginInformTextBox}"
+													 Text="{Binding Path=TeminalIp}"/>
+								</Grid>
+							</Grid>
+							
+							<Grid Grid.Row="1" x:Name="_grid_infromPanel" Visibility="Visible">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="3*"/>
+									<RowDefinition Height="3*"/>
+									<RowDefinition Height="Auto"/>
+									<RowDefinition Height="Auto"/>
+								</Grid.RowDefinitions>
+								<Border Grid.Row="0" Grid.RowSpan="4" Background="Black" Opacity="0.7"/>
+
+								<TreeView x:Name="_treeView_markers"
+													Background="#FF4E4E4E" Margin="3" BorderThickness="2" Foreground="White" BorderBrush="#FF2CA1DF"
+													SelectedItemChanged="_treeView_markers_SelectedItemChanged"
+													Style="{StaticResource DefaultTreeView}"
+													LostFocus="_treeView_markers_LostFocus">
+									<TreeView.ItemContainerStyleSelector>
+										<local:IsLoginItemStyleSelector DefaultStyle="{StaticResource DefaultTreeViewItem}"
+																										LoginStyle="{StaticResource LogoutTreeViewItem}"
+																										PropertyToEvaluate="IsLogin">
+										</local:IsLoginItemStyleSelector>
+									</TreeView.ItemContainerStyleSelector>
+								</TreeView>
+								<TextBox x:Name="msgBox" Grid.Row="1" Grid.Column="0" Style="{StaticResource _style_inputBoxAndMeesageBox}"
+												 IsReadOnly="True"/>
+								<TextBox x:Name="inputMsgBox" Grid.Row="2" Grid.Column="0" Style="{StaticResource _style_inputBoxAndMeesageBox}"
+												 PreviewKeyDown="inputMsgBox_PreviewKeyDown"
+												 IsEnabled="{Binding Path=IsLogin}"
+												 Visibility="Collapsed"/>
+
+								<StackPanel Grid.Row="3" Margin="3" Orientation="Horizontal" HorizontalAlignment="Right">
+									<ToggleButton x:Name="_toggleButton_openInputBox" Content="打开输入框" HorizontalAlignment="Right"
+																Click="_toggleButton_openInputBox_Click" Style="{DynamicResource _style_toggleButton_openInputBox}"/>
+									<Button Content="清屏" Click="clearMessageBoxClick" HorizontalAlignment="Right" 
+													Style="{StaticResource _style_button_openInputBox}"/>
+									<Button Content="保存日志" Click="saveMessageClick" HorizontalAlignment="Right"
+													Style="{StaticResource _style_button_openInputBox}"/>
+									<Button Content="发送消息"  Click="sendMsgBtn_Click" HorizontalAlignment="Right"
+													Style="{StaticResource _style_button_openInputBox}"
+													IsEnabled="{Binding Path=IsLogin}"/>
+								</StackPanel>
+							</Grid>
+						</Grid>
+					</Border>
+					
 					<Border CornerRadius="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Margin="0,10,20,10"
 									Background="#FF423F3F" Opacity="0.8">
 						<Grid >
@@ -329,9 +552,6 @@
 								</Grid.RowDefinitions>
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto"></ColumnDefinition>
-									<ColumnDefinition Width="Auto"></ColumnDefinition>
-									<ColumnDefinition Width="Auto"></ColumnDefinition>
-									<ColumnDefinition Width="Auto"></ColumnDefinition>
 									<ColumnDefinition Width="*"></ColumnDefinition>
 									<ColumnDefinition Width="Auto"></ColumnDefinition>
 									<ColumnDefinition Width="35"></ColumnDefinition>
@@ -344,30 +564,21 @@
 					</StatusBar.ItemsPanel>
 
 					<StatusBarItem Grid.Column="0">
-						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">用户名字：</TextBlock>
-					</StatusBarItem>
-					<StatusBarItem Grid.Column="1">
-						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" x:Name="textBlock_UserName" ></TextBlock>
+						<TextBlock x:Name="_satusBar_message" Style="{StaticResource _statusBarTextBlockStyle}"/>
 					</StatusBarItem>
 					<StatusBarItem Grid.Column="2">
-						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">IP地址：</TextBlock>
-					</StatusBarItem>
-					<StatusBarItem Grid.Column="3">
-						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" x:Name="textBlock_IPAddress"></TextBlock>
-					</StatusBarItem>
-					<StatusBarItem Grid.Column="5">
 						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" >当前坐标：</TextBlock>
 					</StatusBarItem>
-					<StatusBarItem Grid.Column="6">
+					<StatusBarItem Grid.Column="3">
 						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">Lat：</TextBlock>
 					</StatusBarItem>
-					<StatusBarItem Grid.Column="7">
+					<StatusBarItem Grid.Column="4">
 						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" HorizontalAlignment="Left" x:Name="textBlock_Lat"></TextBlock>
 					</StatusBarItem>
-					<StatusBarItem Grid.Column="8">
+					<StatusBarItem Grid.Column="5">
 						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}">Lng：</TextBlock>
 					</StatusBarItem>
-					<StatusBarItem Grid.Column="9">
+					<StatusBarItem Grid.Column="6">
 						<TextBlock Style="{StaticResource _statusBarTextBlockStyle}" HorizontalAlignment="Left"  x:Name="textBlock_Lng"></TextBlock>
 					</StatusBarItem>
 				</StatusBar>

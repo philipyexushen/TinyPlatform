@@ -1,0 +1,26 @@
+<!-- Created with Ai->XAML Export Plug-In Version 0.2 (PC/64) -->
+<!-- By Mike Swanson (http://blog.mikeswanson.com/)           -->
+
+<Viewbox Width="126.960" Height="126.960"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Viewbox.Resources>
+	</Viewbox.Resources>
+	<Canvas Width="126.960" Height="126.960">
+
+  <Canvas>
+
+  <Canvas>
+
+  <Canvas>
+
+  <!-- 图层 1/<编组>/<编组>/<复合路径> -->
+  <Path Fill="#ffff4e4e" Data="F1 M 77.289,75.291 C 68.658,83.920 55.588,85.403 45.433,79.740 L 81.739,43.432 C 87.403,53.588 85.920,66.660 77.289,75.291 Z M 39.550,37.551 C 48.180,28.920 61.252,27.438 71.408,33.102 L 35.102,69.408 C 29.436,59.252 30.919,46.182 39.550,37.551 Z M 86.294,28.546 C 70.900,13.151 45.939,13.151 30.546,28.546 C 15.151,43.941 15.151,68.900 30.546,84.295 C 45.939,99.689 70.900,99.689 86.294,84.295 C 101.689,68.900 101.689,43.941 86.294,28.546 Z"/>
+
+  </Canvas>
+
+  </Canvas>
+
+  </Canvas>
+</Canvas>
+</Viewbox>

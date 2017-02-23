@@ -55,10 +55,15 @@ namespace IpHelperSpace
 			try
 			{
 				Task<IpDetails> ipFetchTask = fetchIp(details);
-				ipFetchTask.Wait();
-				details = ipFetchTask.Result;
 
-				details.Status = IpDetails.DetailsStatus.Successful;
+				if (ipFetchTask.Wait(10000))
+				{
+
+					details = ipFetchTask.Result;
+					details.Status = IpDetails.DetailsStatus.Successful;
+				}
+				else
+					throw new Exception("查询超时");
 			}
 			catch (Exception ex)
 			{
@@ -119,6 +124,5 @@ namespace IpHelperSpace
 			callback(details);
 			IsRequery = false;
 		}
-
 	}
 }

@@ -5,9 +5,49 @@
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:local="clr-namespace:UrgencyRescuePlatform"
 				mc:Ignorable="d"
-				Height="200" Width="300"
-				SizeToContent="WidthAndHeight">
+				Height="206.4" Width="328.2"
+				Icon="icon.ico"
+				MinHeight="120" MinWidth="200">
 	<Grid>
-		
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0" TextOptions.TextFormattingMode="Display">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+
+			<Image Grid.Column="0" Width="50" Height="50" Source="icon.ico" Margin="10,0,0,0"
+						 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			<FlowDocumentScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden">
+				<FlowDocument>
+
+					<Paragraph FontFamily="Microsoft YaHei" Margin="3" FontSize="13">
+						<Bold>
+							地图监控平台 TinyPlatform v1.0
+						</Bold>
+					</Paragraph>
+					<List>
+						<ListItem>
+							<Paragraph FontFamily="Microsoft YaHei" Margin="3" FontSize="12">QQ: 2173454740</Paragraph>
+						</ListItem>
+						<ListItem>
+							<Paragraph FontFamily="Microsoft YaHei" Margin="3" FontSize="12">Email: 2173454740@qq.com</Paragraph>
+						</ListItem>
+					</List>
+					<Paragraph FontFamily="Microsoft YaHei UI" Margin="3" TextAlignment="Right"
+										 FontSize="13">Author: Philip</Paragraph>
+				</FlowDocument>
+			</FlowDocumentScrollViewer>
+		</Grid>
+
+		<Border Grid.Row="1" Background="#FFE7E7E7">
+			<StackPanel >
+				<Button Content="确定" HorizontalAlignment="Right" Margin="8" Padding="10,3,10,3"
+							Click="Button_Click"/>
+			</StackPanel>
+		</Border>
 	</Grid>
 </Window>

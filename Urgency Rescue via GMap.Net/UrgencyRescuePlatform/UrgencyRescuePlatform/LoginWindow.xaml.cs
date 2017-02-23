@@ -27,6 +27,7 @@ namespace UrgencyRescuePlatform
 
 		private bool _searchCompleted = false;
 		private bool _loginButtonClick = false;
+		private bool _isSearchingButtonClick = false;
 
 		public LoginWindow()
 		{
@@ -115,12 +116,8 @@ namespace UrgencyRescuePlatform
 
 		private void _button_searchIp_Click(object sender, RoutedEventArgs e)
 		{
-			if (!IpHelper.IsRequery)
-			{
-				_textbox_ip.Text = "正在查询...";
-				IpHelper.GetIpAndCoordinateAsync(async_getIpHandler);
-			}
-
+			_textbox_ip.Text = "正在查询...";
+			IpHelper.GetIpAndCoordinateAsync(async_getIpHandler);
 			FocusManager.SetFocusedElement(this, this);
 		}
 
@@ -175,6 +172,17 @@ namespace UrgencyRescuePlatform
 				&& _textbox_userName.Text.Length != 0
 				&& _textbox_addressEditor.Text.Length != 0;
 		}
+
+		private void UpdateAddressCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = !IpHelper.IsRequery;
+		}
+
+		private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (!_isSearchingButtonClick)
+				_button_searchIp_Click(null, null);
+		}
 	}
 
 	public class LoginCommand
@@ -191,6 +199,23 @@ namespace UrgencyRescuePlatform
 		public static RoutedUICommand Login
 		{
 			get { return login; }
+		}
+	}
+
+	public class UpdateAddressCommand
+	{
+		private static RoutedUICommand _updateAddress;
+
+		static UpdateAddressCommand()
+		{
+			InputGestureCollection inputs = new InputGestureCollection();
+			inputs.Add(new KeyGesture(Key.F5, ModifierKeys.None, "F5"));
+			_updateAddress = new RoutedUICommand("UpdateAddress", "UpdateAddress", typeof(UpdateAddressCommand), inputs);
+		}
+
+		public static RoutedUICommand UpdateAddress
+		{
+			get { return _updateAddress; }
 		}
 	}
 }

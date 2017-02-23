@@ -47,11 +47,13 @@
     <Reference Include="GMap.NET.WindowsPresentation">
       <HintPath>.\GMap.NET.WindowsPresentation.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="RibbonControlsLibrary, Version=4.0.0.11019, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
@@ -71,10 +73,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="ChinaMapShift.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="GMapHelper.cs" />
@@ -87,8 +85,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MapLoadingHelper.cs" />
+    <Compile Include="Starter.cs" />
     <Compile Include="TcpClientHelper.cs" />
-    <Compile Include="TCPConnectionCore.cs" />
+    <Compile Include="TcpConnectionCore.cs" />
     <Compile Include="TinyMessageBox.xaml.cs">
       <DependentUpon>TinyMessageBox.xaml</DependentUpon>
     </Compile>
@@ -141,6 +140,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
+    <None Include="images\closeIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
+    <Page Include="ControlsDict.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="images\dragControlIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <None Include="images\exitIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="images\saveInform.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </None>
     <Page Include="loginWindowDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -157,15 +176,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindowControlsDict.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -198,7 +209,6 @@
     </EmbeddedResource>
     <None Include="MapCache\DataExp.gmdb" />
     <None Include="MapCache\mapCache.gmdb" />
-    <None Include="MapCache\mapFake.gmdb" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -243,11 +253,23 @@
     <Resource Include="MapSnaps\GoogleChinaSatellite.jpg" />
     <Resource Include="MapSnaps\OviMap.jpg" />
     <Resource Include="MapSnaps\OviMapHybrid.jpg" />
+    <Resource Include="treeViewItem\treeViewItemMore_Fold.png" />
+    <Resource Include="treeViewItem\treeViewItemMore_Unfold.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="menuIcons\more_fold.png" />
+    <Resource Include="menuIcons\more_unfold.png" />
+    <Resource Include="images\markerIcon.png" />
+    <Resource Include="images\roadIcon.png" />
+    <Resource Include="images\mapItemIcon.png" />
+    <Content Include="sounds\warning.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
