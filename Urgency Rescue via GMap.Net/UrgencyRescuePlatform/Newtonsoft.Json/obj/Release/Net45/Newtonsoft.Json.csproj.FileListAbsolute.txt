@@ -1,8 +1,0 @@
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\bin\Release\Net45\Newtonsoft.Json.xml
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\bin\Release\Net45\Newtonsoft.Json.dll
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\bin\Release\Net45\Newtonsoft.Json.pdb
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\bin\Release\Net45\Newtonsoft.Json.dll.CodeAnalysisLog.xml
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\bin\Release\Net45\Newtonsoft.Json.dll.lastcodeanalysissucceeded
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\obj\Release\Net45\Newtonsoft.Json.csprojResolveAssemblyReference.cache
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\obj\Release\Net45\Newtonsoft.Json.dll
-F:\win10\Philip\Documents\Visual Studio 2015\Projects\Urgency Rescue via GMap.Net\UrgencyRescuePlatform\Newtonsoft.Json\obj\Release\Net45\Newtonsoft.Json.pdb
