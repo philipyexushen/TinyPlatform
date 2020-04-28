@@ -351,7 +351,6 @@ namespace TcpClientCore
 			IsConnected = true;
 		}
 
-		//传大数据时，会发生TCP粘包，请注意
 		private void HandleDatagramReceived(IAsyncResult ar)
 		{
 			DebugHelpers.CustomMessageShow("begin Read");
